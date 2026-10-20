@@ -1,0 +1,20 @@
+package com.jarion.community.dao;
+
+import com.jarion.community.vo.CommunityPostVO;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public class CommunityDao {
+    private final SqlSessionTemplate sqlSession;
+
+    public CommunityDao(SqlSessionTemplate sqlSession) {
+        this.sqlSession = sqlSession;
+    }
+
+    public List<CommunityPostVO> selectAllCommunityPosts() {
+        return sqlSession.selectList("selectAllCommunityPosts");
+    }
+}

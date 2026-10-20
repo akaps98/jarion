@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class CommunityPost {
+public class CommunityPostVO {
     private Long postId;
     private String userId;
     private String category;
@@ -17,4 +17,7 @@ public class CommunityPost {
     private boolean isNotice;
     LocalDateTime createDt;
     LocalDateTime updateDt;
+
+    // 댓글 갯수
+    private int commentCnt;
 }

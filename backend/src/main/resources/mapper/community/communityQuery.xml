@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="community">
+    <select id="selectAllCommunityPosts"
+            resultType="com.jarion.common.vo.CommunityPostVO">
+        SELECT POST_ID AS postId
+             , USER_ID AS userId
+             , CATEGORY AS category
+             , TITLE AS title
+             , CONTENT AS content
+             , VIEW_COUNT AS viewCount
+             , IS_NOTICE AS isNotice
+             , CREATE_DT AS createDt
+             , UPDATE_DT AS updateDt
+             , ( SELECT COUNT(cc.COMMENT_ID)
+                    FROM community_comment cc
+                   WHERE cc.POST_ID = cp.POST_ID
+                       ) AS commentCnt
+             FROM community_post cp;
+    </select>
+</mapper>
