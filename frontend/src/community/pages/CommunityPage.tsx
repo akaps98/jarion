@@ -6,6 +6,19 @@ import { useEffect, useMemo, useState } from "react";
 import "./CommunityPage.css";
 import { allPosts, allCategories } from "../api/communityApi";
 
+function getRoleName(role: string) {
+    switch(role) {
+        case "USER":
+            return "코스어";
+        case "PHOTO":
+            return "사진사";
+        case "ADMIN":
+            return "관리자";
+        default:
+            return role ?? "";
+    }
+}
+
 const PAGE_SIZE = 5;
 
 function CommunityPage() {
@@ -21,9 +34,11 @@ function CommunityPage() {
   useEffect(() => {
     const loadData = async() => {
         try {
+            // 새로고침을 이유로 loading 및 error 문 계속 다시 새로
             setLoading(true);
             setError("");
 
+            // 한 번에 조회; Promise.all 사용
             const [postData, categoryData] = await Promise.all([
                 allPosts(),
                 allCategories()
@@ -32,12 +47,14 @@ function CommunityPage() {
             setPosts(postData);
             setCategories(categoryData);
         } catch (error) {
+            // Error 타입 명시 必
             setError(error instanceof Error ? error.message : "조회 중 오류가 발생했습니다.")
         } finally {
             setLoading(true);
         }
     }
 
+    loadData();
     // const loadPosts = async () => {
     //     try {
     //         const data = await allPosts();
@@ -65,8 +82,6 @@ function CommunityPage() {
 
     // loadPosts();
     // loadCategories();
-
-    loadData();
   }, [])
 
   const filteredPosts = useMemo(() => {
