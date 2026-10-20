@@ -13,6 +13,9 @@ spring:
 # Server Port
 server:
   port: 4231
+  servlet:
+    session:
+      timeout: 1m
 
 # MyBatis
 mybatis:
