@@ -1,6 +1,6 @@
 # 📸 자리온 | JARION
 
-<img width="2172" height="724" alt="image" src="https://github.com/user-attachments/assets/f6110589-fb21-49ae-a4ef-9148d8e54ae2" />
+<img width="2172" height="724" alt="image" src="https://github.com/user-attachments/assets/b25b260d-9cb5-4f76-ad85-f11781e9154f" />
 
 > 촬영할 자리를 찾고, 함께할 사람을 만나다.
 
