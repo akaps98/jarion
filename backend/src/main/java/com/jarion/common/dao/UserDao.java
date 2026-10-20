@@ -8,8 +8,11 @@ import com.jarion.common.vo.UserVO;
 
 @Repository
 public class UserDao {
-    @Autowired
-    private SqlSessionTemplate sqlSession;
+    private final SqlSessionTemplate sqlSession;
+
+    public UserDao(SqlSessionTemplate sqlSession) {
+        this.sqlSession = sqlSession;
+    }
 
     public UserVO selectUserByLoginId(String loginID) {
         return sqlSession.selectOne("selectUserByLoginId", loginID);
