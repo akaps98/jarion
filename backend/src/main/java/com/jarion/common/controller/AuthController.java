@@ -79,6 +79,9 @@ public class AuthController {
                         .body(result);
             }
 
+            // 로그인한 시간 추가
+            userService.updateLastLoginDt(loginVO.getLoginId());
+
             session.setAttribute("loginUser", user);
 
             log.info(

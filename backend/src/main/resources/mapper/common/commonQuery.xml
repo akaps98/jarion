@@ -21,4 +21,11 @@
         WHERE LOGIN_ID = #{loginId}
         AND STATUS = 'Y'
     </select>
+
+    <update id="updateLastLoginDt"
+            parameterType="string">
+        UPDATE USERS
+        SET LAST_LOGIN_DT = NOW()
+        WHERE LOGIN_ID = #{loginId}
+    </update>
 </mapper>

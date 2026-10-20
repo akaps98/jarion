@@ -31,4 +31,8 @@ public class UserService {
 
         return user;
     }
+
+    public void updateLastLoginDt(String loginId) {
+        userDao.updateLastLoginDt(loginId);
+    }
 }

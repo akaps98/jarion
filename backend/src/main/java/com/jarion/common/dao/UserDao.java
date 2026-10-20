@@ -14,4 +14,8 @@ public class UserDao {
     public UserVO selectUserByLoginId(String loginID) {
         return sqlSession.selectOne("selectUserByLoginId", loginID);
     }
+
+    public void updateLastLoginDt(String loginId) {
+        sqlSession.update("updateLastLoginDt", loginId);
+    }
 }
