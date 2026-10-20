@@ -111,7 +111,7 @@ public class AuthController {
     // 세션체크용 api
     @GetMapping("/session")
     public ResponseEntity<?> checkSession(HttpSession session) {
-        Object loginUser = session.getAttribute("loginUser");
+        UserVO loginUser = (UserVO) session.getAttribute("loginUser");
 
         if (loginUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
