@@ -6,7 +6,7 @@
 
 <mapper namespace="community">
     <select id="selectAllCommunityPosts"
-            resultType="com.jarion.common.vo.CommunityPostVO">
+            resultType="com.jarion.community.vo.CommunityPostVO">
         SELECT POST_ID AS postId
              , USER_ID AS userId
              , CATEGORY AS category
