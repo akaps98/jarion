@@ -1,5 +1,6 @@
 package com.jarion.community.dao;
 
+import com.jarion.community.vo.CommunityCategoryVO;
 import com.jarion.community.vo.CommunityPostVO;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
@@ -17,4 +18,8 @@ public class CommunityDao {
     public List<CommunityPostVO> selectAllCommunityPosts() {
         return sqlSession.selectList("selectAllCommunityPosts");
     }
-}
+
+    public List<CommunityCategoryVO> selectAllCommunityCategories()
+    {
+        return sqlSession.selectList("selectAllCommunityCategories");
+    }}

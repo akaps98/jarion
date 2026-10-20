@@ -1,6 +1,7 @@
 package com.jarion.community.service;
 
 import com.jarion.community.dao.CommunityDao;
+import com.jarion.community.vo.CommunityCategoryVO;
 import com.jarion.community.vo.CommunityPostVO;
 import org.springframework.stereotype.Service;
 
@@ -16,5 +17,9 @@ public class CommunityService {
 
     public List<CommunityPostVO> selectAllCommunityPosts() {
         return communityDao.selectAllCommunityPosts();
+    }
+
+    public List<CommunityCategoryVO> selectAllCommunityCategories() {
+        return communityDao.selectAllCommunityCategories();
     }
 }

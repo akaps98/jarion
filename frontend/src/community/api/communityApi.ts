@@ -1,0 +1,27 @@
+/**
+ * 모든 게시글 가져옴
+ * @returns List<CommunityPostVO>
+ */
+export const allPosts = async() => {
+    const response = await fetch('/api/community/post/all')
+
+    if(!response.ok) {
+        throw new Error("게시글을 불러오지 못했습니다.");
+    }
+
+    return response.json();
+}
+
+/**
+ * 모든 카테고리 가져옴
+ * @returns List<CommunityCategoryVO>
+ */
+export const allCategories = async() => {
+    const response = await fetch('api/community/category/all')
+
+    if(!response.ok) {
+        throw new Error("카테고리를 불러오지 못했습니다.");
+    }
+
+    return response.json();
+}

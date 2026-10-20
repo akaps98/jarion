@@ -13,13 +13,28 @@
              , TITLE AS title
              , CONTENT AS content
              , VIEW_COUNT AS viewCount
-             , IS_NOTICE AS isNotice
              , CREATE_DT AS createDt
              , UPDATE_DT AS updateDt
              , ( SELECT COUNT(cc.COMMENT_ID)
                     FROM community_comment cc
                    WHERE cc.POST_ID = cp.POST_ID
                        ) AS commentCnt
-             FROM community_post cp;
+            , (  SELECT u.USER_ROLE
+                   FROM users u
+                  WHERE cp.USER_ID = u.USER_ID
+            ) as userRole
+         FROM community_post cp;
+    </select>
+
+    <select id="selectAllCommunityCategories"
+            resultType="com.jarion.community.vo.CommunityCategoryVO">
+        SELECT CATEGORY_CODE as categoryCode
+             , CATEGORY_NAME as categoryName
+             , DESCRIPTION as description
+             , SORT_ORDER as SORT_ORDER
+             , USE_YN as useYn
+             , CREATE_DT AS createDt
+             , UPDATE_DT AS updateDt
+          FROM community_category
     </select>
 </mapper>

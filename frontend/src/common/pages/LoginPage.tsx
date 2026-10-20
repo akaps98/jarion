@@ -23,7 +23,7 @@ function LoginPage() {
 
 			console.log('로그인 성공:', result.data)
 
-			navigate('/reservation')
+			navigate('/community')
 		} catch (error) {
 			console.error(error)
 

@@ -2,6 +2,8 @@
  * common 디렉토리에서 쓰이는 함수들 (다 뺄 필요는 없음)
  */
 
+// 암호화/복호화 관련 시작
+
 const base64ToArrayBuffer = (base64: string) => {
 	const binary = window.atob(base64)
 	const bytes = new Uint8Array(binary.length)
@@ -65,6 +67,14 @@ export const getRsaKey = async () => {
 	return response.json()
 }
 
+// 암호화/복호화 관련 끝
+
+/**
+ * 로그인
+ * @param loginId 
+ * @param password 
+ * @returns UserVO
+ */
 export const login = async (
 	loginId: string,
 	password: string
@@ -98,10 +108,18 @@ export const login = async (
 	}
 }
 
+/**
+ * 세션 체크
+ * @returns UserVO
+ */
 export const checkSession = async () => {
 	return fetch('/api/auth/session')
 }
 
+/**
+ * 로그아웃
+ * @returns 
+ */
 export const logout = async () => {
 	return fetch('/api/auth/logout', {
 		method: 'POST',

@@ -30,6 +30,8 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpSession session) {
+        log.debug("=====AuthController::logout=====");
+
         session.invalidate();
 
         return ResponseEntity.ok().build();
@@ -37,6 +39,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginVO loginVO, HttpSession session) {
+        log.debug("=====AuthController::login=====");
+
         try {
             PrivateKey privateKey =
                     (PrivateKey) session.getAttribute("rsaPrivateKey");
@@ -111,6 +115,8 @@ public class AuthController {
     // 세션체크용 api
     @GetMapping("/session")
     public ResponseEntity<?> checkSession(HttpSession session) {
+        log.debug("=====AuthController::checkSession=====");
+
         UserVO loginUser = (UserVO) session.getAttribute("loginUser");
 
         if (loginUser == null) {
@@ -123,6 +129,8 @@ public class AuthController {
     // rsa key 쌍 생성
     @GetMapping("/rsa-key")
     public Map<String, String> getRSAKey(HttpSession session) throws Exception {
+        log.debug("=====AuthController::getRSAKey=====");
+
         KeyPair keyPair = RSAUtil.generateKeyPair();
 
         // private key must be stored on only SERVER SESSION;

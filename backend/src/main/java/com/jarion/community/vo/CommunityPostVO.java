@@ -14,10 +14,11 @@ public class CommunityPostVO {
     private String title;
     private String content;
     private String viewCount;
-    private boolean isNotice;
-    LocalDateTime createDt;
-    LocalDateTime updateDt;
+    private LocalDateTime createDt;
+    private LocalDateTime updateDt;
 
     // 댓글 갯수
     private int commentCnt;
+    // 해당 글 쓴 사람 role
+    private String userRole;
 }
