@@ -2,7 +2,6 @@ package com.jarion.common.controller;
 
 import java.security.KeyPair;
 import java.security.PrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +10,6 @@ import com.jarion.common.service.UserService;
 import com.jarion.common.vo.LoginVO;
 import com.jarion.common.vo.UserVO;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
