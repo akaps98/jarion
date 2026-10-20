@@ -1,170 +1,78 @@
-import { useMemo, useState } from "react";
+/**
+ * 커뮤니티페이지
+ */
+
+import { useEffect, useMemo, useState } from "react";
 import "./CommunityPage.css";
-
-type Category = "FREE" | "RECRUIT" | "REVIEW" | "QUESTION";
-type Role = "USER" | "ADMIN" | "PHOTO";
-
-type Post = {
-  postId: number;
-  category: Category;
-  title: string;
-  content: string;
-  userName: string;
-  userRole: Role;
-  viewCount: number;
-  isNotice: boolean;
-  createDt: string;
-};
-
-type Comment = {
-  commentId: number;
-  postId: number;
-  userName: string;
-  userRole: Role;
-  content: string;
-  createDt: string;
-};
-
-const categoryNames: Record<Category, string> = {
-  FREE: "자유게시판",
-  RECRUIT: "촬영 모집",
-  REVIEW: "촬영 후기",
-  QUESTION: "질문",
-};
-
-const roleNames: Record<Role, string> = {
-  USER: "코스어",
-  ADMIN: "관리자",
-  PHOTO: "사진사",
-};
-
-// 화면 확인용 데이터. 이후 API 응답으로 교체
-const samplePosts: Post[] = [
-  {
-    postId: 1,
-    category: "FREE",
-    title: "자리온 촬영 예약 이용 안내",
-    content:
-      "사진사가 촬영 부스를 선점하고, 코스어가 해당 부스의 촬영 시간을 예약합니다.\n\n예약 전에 촬영 콘셉트와 제공 사진 수, 보정 범위를 확인해 주세요.",
-    userName: "관리자",
-    userRole: "ADMIN",
-    viewCount: 128,
-    isNotice: true,
-    createDt: "2026-10-20",
-  },
-  {
-    postId: 2,
-    category: "FREE",
-    title: "커뮤니티 이용 안내",
-    content:
-      "촬영 모집, 준비 질문, 이용 후기를 자유롭게 나눠 주세요.\n\n다른 사람의 사진을 게시할 때는 당사자의 동의를 받아 주세요.",
-    userName: "관리자",
-    userRole: "ADMIN",
-    viewCount: 96,
-    isNotice: true,
-    createDt: "2026-10-20",
-  },
-  {
-    postId: 3,
-    category: "RECRUIT",
-    title: "판타지 콘셉트 코스어분을 모집합니다",
-    content:
-      "판타지 분위기의 촬영을 함께할 코스어분을 모집합니다.\n\n어두운 배경과 컬러 조명을 활용할 예정입니다. 망토나 무기 소품이 있는 의상도 좋아요.\n\n※ 화면 확인용 예시 모집 글입니다.",
-    userName: "테스트 사진사",
-    userRole: "PHOTO",
-    viewCount: 42,
-    isNotice: false,
-    createDt: "2026-10-20",
-  },
-  {
-    postId: 4,
-    category: "FREE",
-    title: "처음 촬영하시는 코스어분들을 위한 준비 팁",
-    content:
-      "원하는 포즈나 분위기의 참고 사진을 준비해 주세요.\n\n가발 정리용 빗, 의상 고정용 핀, 수정 화장 도구도 챙기시면 좋습니다.",
-    userName: "테스트 사진사",
-    userRole: "PHOTO",
-    viewCount: 35,
-    isNotice: false,
-    createDt: "2026-10-20",
-  },
-  {
-    postId: 5,
-    category: "QUESTION",
-    title: "코스프레 촬영이 처음인데 포즈도 알려주시나요?",
-    content:
-      "처음으로 부스 촬영을 예약해 보려고 합니다.\n\n포즈가 가장 걱정되는데, 촬영할 때 포즈나 시선도 안내해 주시는지 궁금합니다.",
-    userName: "테스트 사용자",
-    userRole: "USER",
-    viewCount: 18,
-    isNotice: false,
-    createDt: "2026-10-20",
-  },
-  {
-    postId: 6,
-    category: "QUESTION",
-    title: "큰 무기 소품이 있는데 부스에 가져가도 될까요?",
-    content:
-      "캐릭터 소품이 약 150cm 정도 됩니다.\n\n예약 전에 사진사님께 크기를 알려드리고 확인하면 될까요?",
-    userName: "테스트 사용자",
-    userRole: "USER",
-    viewCount: 12,
-    isNotice: false,
-    createDt: "2026-10-20",
-  },
-  {
-    postId: 7,
-    category: "REVIEW",
-    title: "첫 코스프레 촬영 후기",
-    content:
-      "포즈와 시선을 하나씩 안내해 주셔서 편하게 촬영했습니다.\n\n의상에 맞춰 조명 색상을 조절해 주신 점이 특히 좋았습니다.\n\n※ 실제 이용 경험이 아닌 화면 확인용 예시 후기입니다.",
-    userName: "테스트 사용자",
-    userRole: "USER",
-    viewCount: 27,
-    isNotice: false,
-    createDt: "2026-10-20",
-  },
-];
-
-const sampleComments: Comment[] = [
-  {
-    commentId: 1,
-    postId: 3,
-    userName: "테스트 사용자",
-    userRole: "USER",
-    content: "마법사 캐릭터인데 지팡이 소품을 가져가도 될까요?",
-    createDt: "2026-10-20",
-  },
-  {
-    commentId: 2,
-    postId: 3,
-    userName: "테스트 사진사",
-    userRole: "PHOTO",
-    content: "네! 소품 크기를 미리 알려주시면 촬영 준비에 도움이 됩니다.",
-    createDt: "2026-10-20",
-  },
-  {
-    commentId: 3,
-    postId: 5,
-    userName: "테스트 사진사",
-    userRole: "PHOTO",
-    content: "네, 포즈와 시선을 안내해 드려요. 참고 사진도 준비해 오시면 좋아요.",
-    createDt: "2026-10-20",
-  },
-];
+import { allPosts, allCategories } from "../api/communityApi";
 
 const PAGE_SIZE = 5;
 
 function CommunityPage() {
-  const [category, setCategory] = useState<Category | "ALL">("ALL");
+  const [posts, setPosts] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [category, setCategory] = useState("ALL");
   const [keyword, setKeyword] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [page, setPage] = useState(1);
-  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [selectedPost, setSelectedPost] = useState<any | null>(null);
+
+  useEffect(() => {
+    const loadData = async() => {
+        try {
+            setLoading(true);
+            setError("");
+
+            const [postData, categoryData] = await Promise.all([
+                allPosts(),
+                allCategories()
+            ])
+
+            setPosts(postData);
+            setCategories(categoryData);
+        } catch (error) {
+            setError(error instanceof Error ? error.message : "조회 중 오류가 발생했습니다.")
+        } finally {
+            setLoading(true);
+        }
+    }
+
+    // const loadPosts = async () => {
+    //     try {
+    //         const data = await allPosts();
+
+    //         setPosts(data);
+    //     } catch (error) {
+    //         // Error 타입 명시 必
+    //         setError(error instanceof Error ? error.message : "게시글 조회 중 오류가 발생했습니다.");
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // }
+
+    // const loadCategories = async () => {
+    //     try {
+    //         const data = await allCategories();
+
+    //         setCategory(data);
+    //     } catch (error) {
+    //         setError(error instanceof Error ? error.message : "카테고리 조회 중 오류가 발생했습니다.");
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // }
+
+    // loadPosts();
+    // loadCategories();
+
+    loadData();
+  }, [])
 
   const filteredPosts = useMemo(() => {
     const search = keyword.trim().toLowerCase();
 
-    return samplePosts
+    return posts
       .filter((post) => {
         const matchesCategory =
           category === "ALL" || post.category === category;
