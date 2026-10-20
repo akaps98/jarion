@@ -88,7 +88,7 @@
 
 코스어와 사진사가 촬영 정보를 공유하고 소통하는 공간입니다.
 
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/e73b8fc3-7209-4d93-96ce-d72daf6e3762" />
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/e94c023e-cb77-4d14-be64-4920b29ca715" />
 
 ### 기본 화면
 
