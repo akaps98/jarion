@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import "./CommunityPage.css";
-import { allPosts, allCategories, updatePostViewCount } from "../api/communityApi";
+import { allPosts, allCategories, updatePostViewCount, commentsForPost } from "../api/communityApi";
 
 const PAGE_SIZE = 5;
 
@@ -14,6 +14,10 @@ function CommunityPage() {
   const [categories, setCategories] = useState<any[]>([]);
   // 현재 선택한 카테고리
   const [category, setCategory] = useState("ALL");
+  // 현재 게시글에 달린 댓글
+  const [comments, setComments] = useState<any[]>([]);
+  // 현재 작성한 댓글
+  const [comment, setComment] = useState("");
   const [keyword, setKeyword] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -104,6 +108,9 @@ function CommunityPage() {
         )
       );
 
+      const comments = await commentsForPost(post.postId);
+      // 댓글 목록 갱신
+      setComments(comments);
       // 상세 화면 열기
       setSelectedPost(updatedPost);
     } catch (error) {
@@ -207,26 +214,22 @@ function CommunityPage() {
                 댓글 <span>{selectedPost.commentCnt}</span>
               </h3>
 
-              <p className="community-comment-empty">
-                아직 등록된 댓글이 없습니다.
-              </p>
-
-              {/* {selectedPost.commentCnt === 0 ? (
+              {selectedPost.commentCnt === 0 ? (
                 <p className="community-comment-empty">
                   아직 등록된 댓글이 없습니다.
                 </p>
               ) : (
-                selectedComments.map((comment) => (
+                comments.map((comment) => (
                   <article className="community-comment" key={comment.commentId}>
                     <div className="community-meta">
                       <strong>{comment.userName}</strong>
-                      <span>{roleNames[comment.userRole]}</span>
-                      <span>{comment.createDt}</span>
+                      <span>{comment.userRole}</span>
+                      <span>{comment.createDt?.replace("T", " ")}</span>
                     </div>
                     <p>{comment.content}</p>
                   </article>
                 ))
-              )} */}
+              )}
             </section>
           </section>
         ) : (

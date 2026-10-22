@@ -1,6 +1,7 @@
 package com.jarion.community.dao;
 
 import com.jarion.community.vo.CommunityCategoryVO;
+import com.jarion.community.vo.CommunityCommentVO;
 import com.jarion.community.vo.CommunityPostVO;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
@@ -25,5 +26,9 @@ public class CommunityDao {
 
     public void updatePostViewCount(String postId) {
         sqlSession.update("updatePostViewCount", postId);
+    }
+
+    public List<CommunityCommentVO> selectCommentsOnPost(String postId) {
+        return sqlSession.selectList("selectCommentsOnPost", postId);
     }
 }

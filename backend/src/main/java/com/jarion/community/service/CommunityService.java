@@ -2,6 +2,7 @@ package com.jarion.community.service;
 
 import com.jarion.community.dao.CommunityDao;
 import com.jarion.community.vo.CommunityCategoryVO;
+import com.jarion.community.vo.CommunityCommentVO;
 import com.jarion.community.vo.CommunityPostVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -28,5 +29,9 @@ public class CommunityService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void updatePostViewCount(String postId) {
         communityDao.updatePostViewCount(postId);
+    }
+
+    public List<CommunityCommentVO> selectCommentsOnPost(String postId) {
+        return communityDao.selectCommentsOnPost(postId);
     }
 }

@@ -2,6 +2,7 @@ package com.jarion.community.controller;
 
 import com.jarion.community.service.CommunityService;
 import com.jarion.community.vo.CommunityCategoryVO;
+import com.jarion.community.vo.CommunityCommentVO;
 import com.jarion.community.vo.CommunityPostVO;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -67,5 +68,25 @@ public class CommunityController {
         communityService.updatePostViewCount(postId);
 
         return ResponseEntity.ok().build();
+    }
+
+    // GET 요청에는 body 못들어감
+    // @RequestBody -> @RequestParam으로 변경
+    @GetMapping("/post/comment")
+    public ResponseEntity<?> selectCommentsOnPost(@RequestParam String postId, HttpSession session) {
+        log.debug("=====CommunityController::selectCommentsOnPost=====");
+
+        if(session.getAttribute("loginUser") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        List<CommunityCommentVO> comments = communityService.selectCommentsOnPost(postId);
+
+        // 게시글에 댓글이 없는 경우도 있음
+//        if (comments.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        }
+
+        return ResponseEntity.ok(comments);
     }
 }

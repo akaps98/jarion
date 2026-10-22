@@ -48,9 +48,34 @@
       ORDER BY sort_order
     </select>
 
-    <update id="updatePostViewCount">
+    <update id="updatePostViewCount"
+            parameterType="string">
         UPDATE community_post
            SET VIEW_COUNT = VIEW_COUNT + 1
          WHERE POST_ID = #{postId}
     </update>
+
+    <select id="selectCommentsOnPost"
+            resultType="com.jarion.community.vo.CommunityCommentVO"
+            parameterType="string">
+        SELECT cc.COMMENT_ID as commentId
+             , cc.POST_ID as postId
+             , cc.USER_ID as userId
+             , (SELECT u.USER_NAME
+                  FROM users u
+                 WHERE u.USER_ID = cc.USER_ID)
+            AS userName
+             , (SELECT u.USER_ROLE
+                  FROM users u
+                 WHERE u.USER_ID = cc.USER_ID)
+            AS userRole
+             , cc.CONTENT as content
+             , cc.CREATE_DT AS createDt
+             , cc.UPDATE_DT AS updateDt
+          FROM community_comment cc
+          JOIN community_post cp
+            ON cc.POST_ID = cp.POST_ID
+         WHERE cc.POST_ID = #{postId}
+         ORDER BY cc.CREATE_DT DESC
+    </select>
 </mapper>

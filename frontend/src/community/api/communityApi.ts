@@ -39,3 +39,13 @@ export const updatePostViewCount = async (postId: string) => {
         throw new Error("오류가 발생했습니다.")
     }
 }
+
+export const commentsForPost = async (postId: string) => {
+    const response = await fetch(`/api/community/post/comment?postId=${encodeURIComponent(postId)}`)
+
+    if(!response.ok) {
+        throw new Error("댓글을 불러오지 못했습니다.");
+    }
+
+    return response.json();
+}
