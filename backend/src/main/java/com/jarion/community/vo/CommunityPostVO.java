@@ -11,6 +11,8 @@ public class CommunityPostVO {
     private Long postId;
     private String userId;
     private String category;
+    // 카테고리 이름
+    private String categoryName;
     private String title;
     private String content;
     private String viewCount;

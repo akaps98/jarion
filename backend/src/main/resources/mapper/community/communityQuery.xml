@@ -10,31 +10,43 @@
         SELECT POST_ID AS postId
              , USER_ID AS userId
              , CATEGORY AS category
+             , ( SELECT cc1.CATEGORY_NAME
+                   FROM community_category cc1
+                  WHERE cp.CATEGORY = cc1.CATEGORY_CODE
+             ) AS categoryName
              , TITLE AS title
              , CONTENT AS content
              , VIEW_COUNT AS viewCount
              , CREATE_DT AS createDt
              , UPDATE_DT AS updateDt
              , ( SELECT COUNT(cc.COMMENT_ID)
-                    FROM community_comment cc
-                   WHERE cc.POST_ID = cp.POST_ID
-                       ) AS commentCnt
-            , (  SELECT u.USER_ROLE
-                   FROM users u
-                  WHERE cp.USER_ID = u.USER_ID
-            ) as userRole
-         FROM community_post cp;
+                   FROM community_comment cc
+                  WHERE cc.POST_ID = cp.POST_ID
+             ) AS commentCnt
+             , ( SELECT u.USER_ROLE
+                  FROM users u
+                 WHERE cp.USER_ID = u.USER_ID
+             ) AS userRole
+         FROM community_post cp
+     ORDER BY cp.CREATE_DT desc
     </select>
 
     <select id="selectAllCommunityCategories"
             resultType="com.jarion.community.vo.CommunityCategoryVO">
         SELECT CATEGORY_CODE as categoryCode
-             , CATEGORY_NAME as categoryName
-             , DESCRIPTION as description
-             , SORT_ORDER as SORT_ORDER
-             , USE_YN as useYn
-             , CREATE_DT AS createDt
-             , UPDATE_DT AS updateDt
-          FROM community_category
+        , CATEGORY_NAME as categoryName
+        , DESCRIPTION as description
+        , SORT_ORDER as SORT_ORDER
+        , USE_YN as useYn
+        , CREATE_DT AS createDt
+        , UPDATE_DT AS updateDt
+        FROM community_category
+      ORDER BY sort_order
     </select>
+
+    <update id="updatePostViewCount">
+        UPDATE jarion.community_post
+           SET VIEW_COUNT = VIEW_COUNT + 1
+         WHERE POST_ID = #{postId}
+    </update>
 </mapper>

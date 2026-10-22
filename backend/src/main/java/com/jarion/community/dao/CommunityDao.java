@@ -19,7 +19,11 @@ public class CommunityDao {
         return sqlSession.selectList("selectAllCommunityPosts");
     }
 
-    public List<CommunityCategoryVO> selectAllCommunityCategories()
-    {
+    public List<CommunityCategoryVO> selectAllCommunityCategories() {
         return sqlSession.selectList("selectAllCommunityCategories");
-    }}
+    }
+
+    public void updatePostViewCount(String postId) {
+        sqlSession.update("updatePostViewCount", postId);
+    }
+}
