@@ -64,7 +64,7 @@ public class CommunityController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        communityService.updatePostViewCount(postId); //t
+        communityService.updatePostViewCount(postId);
 
         return ResponseEntity.ok().build();
     }
