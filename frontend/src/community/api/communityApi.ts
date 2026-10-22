@@ -2,7 +2,7 @@
  * 모든 게시글 가져옴
  * @returns List<CommunityPostVO>
  */
-export const allPosts = async() => {
+export const allPosts = async () => {
     const response = await fetch('/api/community/post/all')
 
     if(!response.ok) {
@@ -16,12 +16,26 @@ export const allPosts = async() => {
  * 모든 카테고리 가져옴
  * @returns List<CommunityCategoryVO>
  */
-export const allCategories = async() => {
-    const response = await fetch('api/community/category/all')
+export const allCategories = async () => {
+    const response = await fetch('/api/community/category/all')
 
     if(!response.ok) {
         throw new Error("카테고리를 불러오지 못했습니다.");
     }
 
     return response.json();
+}
+
+/**
+ * 게시글 읽을 시, 조회수 올림
+ */
+export const updatePostViewCount = async (postId: string) => {
+    const response = await fetch('/api/community/post/viewcount', {
+        method: "POST",
+        body: postId
+    });
+
+    if(!response.ok) {
+        throw new Error("오류가 발생했습니다.")
+    }
 }

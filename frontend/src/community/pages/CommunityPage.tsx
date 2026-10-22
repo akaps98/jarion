@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import "./CommunityPage.css";
-import { allPosts, allCategories } from "../api/communityApi";
+import { allPosts, allCategories, updatePostViewCount } from "../api/communityApi";
 
 const PAGE_SIZE = 5;
 
@@ -46,6 +46,7 @@ function CommunityPage() {
     loadData();
   }, [])
 
+  // 카테고리 변경 or 검색 시
   const filteredPosts = useMemo(() => {
     const search = keyword.trim().toLowerCase();
 
@@ -82,6 +83,32 @@ function CommunityPage() {
           default:
               return role ?? "";
       }
+  }
+
+  // 게시글 클릭 시
+  async function openPost(post: any) {
+    try {
+      // DB 조회 수 증가
+      await updatePostViewCount(post.postId);
+
+      // 상세 화면에 표시할 조회 수도 증가
+      const updatedPost = {
+        ...post,
+        viewCount: Number(post.viewCount ?? 0) + 1
+      };
+
+      // 목록으로 돌아가도 증가한 조회 수가 보이도록 갱신
+      setPosts((prevPosts) =>
+        prevPosts.map((item) =>
+          item.postId === post.postId ? updatedPost : item
+        )
+      );
+
+      // 상세 화면 열기
+      setSelectedPost(updatedPost);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "게시글을 여는 중 오류가 발생했습니다.");
+    }
   }
 
   const pageCount = Math.ceil(filteredPosts.length / PAGE_SIZE);
@@ -251,7 +278,7 @@ function CommunityPage() {
                           <button
                             type="button"
                             className="community-post-link"
-                            onClick={() => setSelectedPost(post)}
+                            onClick={() => openPost(post)}
                           >
                             {post.title}
                             {post.commentCnt > 0 && (
