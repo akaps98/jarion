@@ -56,7 +56,6 @@ public class CommunityController {
         return ResponseEntity.ok(allCategories);
     }
 
-    @Transactional
     @PostMapping("/post/viewcount")
     public ResponseEntity<?> updatePostViewCount(@RequestBody String postId, HttpSession session) {
         log.debug("=====CommunityController::updatePostViewCount=====");
