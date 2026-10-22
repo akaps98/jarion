@@ -50,7 +50,7 @@ function Header() {
 		<header className="header">
 			<div
 				className="header-logo"
-				onClick={() => navigate('/reservation')}
+				onClick={() => navigate('/community')}
 			>
 				JARION
 			</div>
