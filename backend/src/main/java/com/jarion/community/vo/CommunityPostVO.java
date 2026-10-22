@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class CommunityPostVO {
     private Long postId;
     private String userId;
+    private String userName;
     private String category;
     // 카테고리 이름
     private String categoryName;

@@ -9,6 +9,10 @@
             resultType="com.jarion.community.vo.CommunityPostVO">
         SELECT POST_ID AS postId
              , USER_ID AS userId
+             , ( SELECT u.USER_NAME
+                   FROM users u
+                  WHERE cp.USER_ID = u.USER_ID
+             ) AS userName
              , CATEGORY AS category
              , ( SELECT cc1.CATEGORY_NAME
                    FROM community_category cc1
