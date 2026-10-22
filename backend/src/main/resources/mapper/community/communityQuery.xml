@@ -45,7 +45,7 @@
     </select>
 
     <update id="updatePostViewCount">
-        UPDATE jarion.community_post
+        UPDATE community_post
            SET VIEW_COUNT = VIEW_COUNT + 1
          WHERE POST_ID = #{postId}
     </update>
