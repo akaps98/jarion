@@ -8,6 +8,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { checkSession } from "../api/commonApi";
+import '../../community/pages/CommunityPage.css'
 
 function CheckSessionRoute() {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
@@ -39,7 +40,12 @@ function CheckSessionRoute() {
 
     // 세션 확인 중
     if (isAuthenticated === null) {
-        return <div>Loading...</div>
+        return (
+            <div className="community-loading" role="status">
+                <div className="community-spinner" aria-hidden="true"></div>
+                <p>로그인 정보를 확인하는 중입니다.</p>
+            </div>
+        );
     }
 
     // 로그인 안 됨

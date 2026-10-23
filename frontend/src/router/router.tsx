@@ -19,12 +19,12 @@ const router = createBrowserRouter([
 				element: <MainLayout />,
 				children: [
 					{
-						path: '/reservation',
-						element: <ReservationPage />,
-					},
-					{
 						path: '/community',
 						element: <CommunityPage />,
+					},
+					{
+						path: '/reservation',
+						element: <ReservationPage />,
 					},
 				],
 			},
