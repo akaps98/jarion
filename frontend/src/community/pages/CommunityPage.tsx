@@ -5,6 +5,8 @@
 import { useEffect, useMemo, useState } from "react";
 import "./CommunityPage.css";
 import { allPosts, allCategories, updatePostViewCount, commentsForPost } from "../api/communityApi";
+import PostDetail from "./PostDetailPage";
+import Button from "../../common/components/Button";
 
 const PAGE_SIZE = 5;
 
@@ -181,57 +183,12 @@ function CommunityPage() {
         </nav>
 
         {selectedPost ? (
-          <section className="community-detail" aria-label="게시글 상세">
-            <button
-              type="button"
-              className="community-back"
-              onClick={() => setSelectedPost(null)}
-            >
-              목록으로
-            </button>
-
-            <article>
-              <header className="community-detail-header">
-                <span className={`community-badge ${selectedPost.category}`}>
-                  {selectedPost.categoryName}
-                </span>
-
-                <h2>{selectedPost.title}</h2>
-
-                <div className="community-meta">
-                  <strong>{selectedPost.userName}</strong>
-                  <span>{getRoleName(selectedPost.userRole)}</span>
-                  <span>{selectedPost.createDt?.replace("T", " ")}</span>
-                  <span>조회 {selectedPost.viewCount}</span>
-                </div>
-              </header>
-
-              <div className="community-content">{selectedPost.content}</div>
-            </article>
-
-            <section className="community-comments" aria-label="댓글">
-              <h3>
-                댓글 <span>{selectedPost.commentCnt}</span>
-              </h3>
-
-              {selectedPost.commentCnt === 0 ? (
-                <p className="community-comment-empty">
-                  아직 등록된 댓글이 없습니다.
-                </p>
-              ) : (
-                comments.map((comment) => (
-                  <article className="community-comment" key={comment.commentId}>
-                    <div className="community-meta">
-                      <strong>{comment.userName}</strong>
-                      <span>{comment.userRole}</span>
-                      <span>{comment.createDt?.replace("T", " ")}</span>
-                    </div>
-                    <p>{comment.content}</p>
-                  </article>
-                ))
-              )}
-            </section>
-          </section>
+          <PostDetail
+            post={selectedPost}
+            comments={comments}
+            getRoleName={getRoleName}
+            onClose={() => setSelectedPost(null)}
+          />
         ) : (
           <section className="community-board" aria-label="게시글 목록">
             <div className="community-toolbar">
@@ -251,7 +208,9 @@ function CommunityPage() {
                 }}
               />
             </div>
-
+            <div className="post-actions">
+              <Button>글쓰기</Button>
+            </div>
             <div className="community-table-wrap">
               <table className="community-table">
                 <thead>

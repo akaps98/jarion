@@ -266,96 +266,6 @@
   color: #fff;
 }
 
-.community-detail {
-  padding: 30px;
-}
-
-.community-back {
-  margin-bottom: 26px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.community-back:hover {
-  color: var(--primary);
-}
-
-.community-detail-header {
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--line);
-}
-
-.community-detail-header h2 {
-  margin: 16px 0;
-  font-size: 25px;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-}
-
-.community-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.community-meta strong {
-  color: var(--text);
-  font-size: 13px;
-}
-
-.community-content {
-  min-height: 220px;
-  padding: 32px 0;
-  font-size: 15px;
-  line-height: 1.9;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-.community-comments {
-  padding-top: 24px;
-  border-top: 1px solid var(--line);
-}
-
-.community-comments h3 {
-  margin: 0 0 20px;
-  font-size: 16px;
-}
-
-.community-comments h3 span {
-  margin-left: 4px;
-  color: var(--primary);
-}
-
-.community-comment {
-  padding: 20px 0;
-  border-bottom: 1px solid var(--line);
-}
-
-.community-comment:last-child {
-  border-bottom: 0;
-}
-
-.community-comment p {
-  margin: 12px 0 0;
-  font-size: 14px;
-  line-height: 1.7;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-.community-comment-empty {
-  padding: 20px 0;
-  color: var(--muted);
-  font-size: 14px;
-}
-
 .community-loading {
   margin: 40px auto;
   padding: 24px;
@@ -381,6 +291,12 @@
   border-radius: 50%;
 
   animation: community-spin 0.8s linear infinite;
+}
+
+.post-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 24px 16px;
 }
 
 @keyframes community-spin {
@@ -415,59 +331,3 @@
   color: #8f3a3a;
   word-break: break-word;
 }
-
-@media (max-width: 700px) {
-  .community {
-    padding: 24px 16px 48px;
-  }
-
-  .community-hero {
-    padding: 28px 22px;
-  }
-
-  .community-hero p {
-    font-size: 14px;
-  }
-
-  .community-toolbar {
-    align-items: stretch;
-    flex-direction: column;
-    gap: 14px;
-    padding: 20px 16px;
-  }
-
-  .community-search {
-    width: 100%;
-  }
-
-  .community-table th,
-  .community-table td {
-    padding: 16px 10px;
-  }
-
-  /* 모바일에서는 날짜와 조회 수를 상세 화면에서 확인 */
-  .community-table th:nth-child(4),
-  .community-table td:nth-child(4),
-  .community-table th:nth-child(5),
-  .community-table td:nth-child(5) {
-    display: none;
-  }
-
-  .community-table .community-title-cell {
-    width: auto;
-  }
-
-  .community-author {
-    font-size: 11px;
-    white-space: normal;
-  }
-
-  .community-detail {
-    padding: 22px 18px;
-  }
-
-  .community-detail-header h2 {
-    font-size: 21px;
-  }
-}
-
