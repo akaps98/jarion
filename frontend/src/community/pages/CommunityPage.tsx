@@ -188,6 +188,7 @@ function CommunityPage() {
 
         {goWritePost ? ( 
           <WritePostPage
+            categories={categories}
             onClose={() => setGoWritePost(false)}
           />
         ) : selectedPost ? (

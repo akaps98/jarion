@@ -40,6 +40,11 @@ export const updatePostViewCount = async (postId: string) => {
     }
 }
 
+/**
+ * 한 게시글의 댓글 목록을 불러옴
+ * @param postId 
+ * @returns List<CommunityCommentVO>
+ */
 export const commentsForPost = async (postId: string) => {
     const response = await fetch(`/api/community/post/comment?postId=${encodeURIComponent(postId)}`)
 
@@ -48,4 +53,23 @@ export const commentsForPost = async (postId: string) => {
     }
 
     return response.json();
+}
+
+export const writePost = async (
+    category: string,
+    title: string,
+    content: string
+) => {
+    const response = await fetch('/api/community/post', {
+        method: "POST",
+        body: JSON.stringify({
+            category: category,
+            title: title,
+            content: content
+        })
+    })
+
+    if(!response.ok) {
+        throw new Error("게시글 작성에 실패했습니다.");
+    }
 }

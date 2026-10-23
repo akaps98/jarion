@@ -34,4 +34,9 @@ public class CommunityService {
     public List<CommunityCommentVO> selectCommentsOnPost(String postId) {
         return communityDao.selectCommentsOnPost(postId);
     }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void insertSinglePost(CommunityPostVO post) {
+        communityDao.insertSinglePost(post);
+    }
 }

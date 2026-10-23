@@ -31,4 +31,8 @@ public class CommunityDao {
     public List<CommunityCommentVO> selectCommentsOnPost(String postId) {
         return sqlSession.selectList("selectCommentsOnPost", postId);
     }
+
+    public void insertSinglePost(CommunityPostVO post) {
+        sqlSession.insert("insertSinglePost", post);
+    }
 }

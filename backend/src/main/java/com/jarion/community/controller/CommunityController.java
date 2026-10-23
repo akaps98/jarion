@@ -1,5 +1,6 @@
 package com.jarion.community.controller;
 
+import com.jarion.common.vo.UserVO;
 import com.jarion.community.service.CommunityService;
 import com.jarion.community.vo.CommunityCategoryVO;
 import com.jarion.community.vo.CommunityCommentVO;
@@ -88,5 +89,22 @@ public class CommunityController {
 //        }
 
         return ResponseEntity.ok(comments);
+    }
+
+    @PostMapping("/post")
+    public ResponseEntity<?> insertSinglePost(@RequestBody CommunityPostVO post, HttpSession session) {
+        log.debug("=====CommunityController::insertSinglePost=====");
+
+        UserVO loginUser = (UserVO) session.getAttribute("loginUser");
+
+        if(loginUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        post.setUserId(loginUser.getUserId());
+
+        communityService.insertSinglePost(post);
+
+        return ResponseEntity.ok().build();
     }
 }

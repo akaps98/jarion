@@ -78,4 +78,20 @@
          WHERE cc.POST_ID = #{postId}
          ORDER BY cc.CREATE_DT DESC
     </select>
+
+        <insert id="insertSinglePost"
+            parameterType="com.jarion.community.vo.CommunityPostVO">
+        INSERT INTO community_post
+             ( USER_ID
+             , CATEGOTY
+             , TITLE
+             , CONTENT
+             , CREATE_DT
+             ) VALUES
+             ( #{userId}
+             , #{category}
+             , #{title}
+             , #{content}
+             , NOW() )
+    </insert>
 </mapper>

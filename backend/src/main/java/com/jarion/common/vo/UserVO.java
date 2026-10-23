@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class UserVO {
-    private Long userId;
+    private String userId;
     private String loginId;
     private String password;
     private String userName;

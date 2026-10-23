@@ -1,0 +1,125 @@
+.community-write {
+  padding: 30px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.common-button.write-back {
+  margin-bottom: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.common-button.write-back:hover:not(:disabled) {
+  color: var(--primary);
+  filter: none;
+}
+
+.write-header {
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.write-header h2 {
+  margin: 0 0 10px;
+  font-size: 25px;
+}
+
+.write-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.write-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-top: 28px;
+}
+
+.write-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.write-field label {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.write-field input,
+.write-field select,
+.write-field textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #dce0ea;
+  border-radius: 9px;
+  background: #fafbfe;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+}
+
+.write-field select {
+  max-width: 300px;
+}
+
+.write-field textarea {
+  min-height: 320px;
+  resize: vertical;
+  line-height: 1.8;
+}
+
+.write-field input:focus-visible,
+.write-field select:focus-visible,
+.write-field textarea:focus-visible {
+  border-color: var(--primary);
+  outline: 3px solid #a9b2ff;
+  outline-offset: 3px;
+}
+
+.write-field input::placeholder,
+.write-field textarea::placeholder {
+  color: #949bad;
+}
+
+.write-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.common-button.write-cancel {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--muted);
+}
+
+@media (max-width: 700px) {
+  .community-write {
+    padding: 22px 18px;
+  }
+
+  .write-header h2 {
+    font-size: 21px;
+  }
+
+  .write-field select {
+    max-width: 100%;
+  }
+
+  .write-field textarea {
+    min-height: 260px;
+  }
+}
