@@ -1,0 +1,24 @@
+.common-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background-color: var(--primary, #5865e8);
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.common-button:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+.common-button:focus-visible {
+  outline: 3px solid #a9b2ff;
+  outline-offset: 3px;
+}
+
+.common-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
