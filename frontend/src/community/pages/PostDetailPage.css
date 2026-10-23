@@ -2,17 +2,20 @@
   padding: 30px;
 }
 
-.community-back {
+.common-button.community-back {
   margin-bottom: 26px;
   padding: 0;
-  border: 0;
+  border: none;
+  border-radius: 0;
   background: transparent;
   color: var(--muted);
   font-size: 14px;
 }
 
-.community-back:hover {
+.common-button.community-back:hover:not(:disabled) {
+  background: transparent;
   color: var(--primary);
+  filter: none;
 }
 
 .community-detail-header {

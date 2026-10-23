@@ -7,6 +7,7 @@ import "./CommunityPage.css";
 import { allPosts, allCategories, updatePostViewCount, commentsForPost } from "../api/communityApi";
 import PostDetail from "./PostDetailPage";
 import Button from "../../common/components/Button";
+import WritePostPage from "./WritePostPage";
 
 const PAGE_SIZE = 5;
 
@@ -24,7 +25,10 @@ function CommunityPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [page, setPage] = useState(1);
+  // 클릭한 게시글
   const [selectedPost, setSelectedPost] = useState<any | null>(null);
+  // 글쓰기 페이지
+  const [goWritePost, setGoWritePost] = useState(false);
 
   useEffect(() => {
     const loadData = async() => {
@@ -182,7 +186,11 @@ function CommunityPage() {
           ))}
         </nav>
 
-        {selectedPost ? (
+        {goWritePost ? ( 
+          <WritePostPage
+            onClose={() => setGoWritePost(false)}
+          />
+        ) : selectedPost ? (
           <PostDetail
             post={selectedPost}
             comments={comments}
@@ -209,7 +217,7 @@ function CommunityPage() {
               />
             </div>
             <div className="post-actions">
-              <Button>글쓰기</Button>
+              <Button onClick={() => setGoWritePost(true)}>글쓰기</Button>
             </div>
             <div className="community-table-wrap">
               <table className="community-table">

@@ -1,4 +1,9 @@
+import Button from '../../common/components/Button';
 import './PostDetailPage.css';
+
+/**
+ * 게시글 클릭시 보여주는 게시글 상세 페이지
+ */
 
 // 파라미터 타입 강제
 type PostDetailProps = {
@@ -11,13 +16,19 @@ type PostDetailProps = {
 function PostDetail({post, comments, getRoleName, onClose}: PostDetailProps) {
     return (
         <section className="community-detail" aria-label="게시글 상세">
-            <button
+            {/* <button
                 type="button"
                 className="community-back"
                 onClick={onClose}
             >
                 목록으로
-            </button>
+            </button> */}
+            <Button
+                className='community-back'
+                onClick={onClose}
+            >
+                목록으로
+            </Button>
 
             <article>
                 <header className="community-detail-header">
