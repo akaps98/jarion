@@ -3,8 +3,16 @@ import './Header.css'
 import { useEffect, useState } from 'react'
 import { logout, checkSession } from '../api/commonApi'
 
+type UserVO = {
+	userId: string
+	userName: string
+	userRole: string
+	loginId?: string
+	status?: string
+}
+
 function Header() {
-    const [userRole, setUserRole] = useState<string>('')
+	const [user, setUser] = useState<UserVO | null>(null)
 
 	const navigate = useNavigate()
 
@@ -12,7 +20,7 @@ function Header() {
         // useEffect 콜백은 아무것도 return 불가.
         // async는 항상 Promise 객체 반환.
         // 그런고로 안에서 함수 만들어서 해당 함수를 바로 리턴.
-        const checkRole = async () => {
+        const checkUserInfo = async () => {
             const response = await checkSession()
 
             if (!response.ok) {
@@ -23,10 +31,11 @@ function Header() {
 
             const data = await response.json();
 
-            setUserRole(data.userRole);
+			// 그냥 userVO 자체를 리턴
+			setUser(data)
         } 
 
-        checkRole();
+        checkUserInfo();
     }, [])
 
 	const handleLogout = async () => {
@@ -64,7 +73,7 @@ function Header() {
 					커뮤니티
 				</button>
 
-                {userRole === 'ADMIN' && (
+                {user?.userRole === 'ADMIN' && (
                     <button onClick={() => navigate('/admin')}>
                         관리자
                     </button>
@@ -72,6 +81,12 @@ function Header() {
 			</nav>
 
 			<div className="header-user">
+				<button className="header-user-button" onClick={() => navigate('/mypage')}>
+					{user?.userName}
+				</button>
+			</div>
+
+			<div className="header-logout">
 				<button onClick={handleLogout}>
 					로그아웃
 				</button>

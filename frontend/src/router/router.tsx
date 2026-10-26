@@ -4,6 +4,7 @@ import ReservationPage from "../reservation/pages/ReservationPage";
 import CommunityPage from "../community/pages/CommunityPage";
 import CheckSessionRoute from "../common/components/CheckSessionRoute";
 import MainLayout from "../common/layouts/MainLayout";
+import MyPage from "../community/pages/MyPage";
 
 const router = createBrowserRouter([
 	{
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
 						path: '/reservation',
 						element: <ReservationPage />,
 					},
+					{
+						path: '/mypage',
+						element: <MyPage />	
+					}
 				],
 			},
 		],

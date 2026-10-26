@@ -26,7 +26,8 @@
 }
 
 .header-menu button,
-.header-user button {
+.header-user-button,
+.header-logout button {
 	border: none;
 	background: none;
 
@@ -37,4 +38,25 @@
 
 .header-user {
 	margin-left: auto;
+}
+
+.header-user-button {
+	font-weight: 800;
+	color: #333333;
+}
+
+.header-user-button:hover {
+	text-decoration: underline;
+}
+
+.header-logout {
+	margin-left: 16px;
+}
+
+.header-logout button {
+	color: #666666;
+}
+
+.header-logout button:hover {
+	color: #000000;
 }
