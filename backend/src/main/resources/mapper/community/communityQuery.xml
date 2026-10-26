@@ -32,6 +32,7 @@
                  WHERE cp.USER_ID = u.USER_ID
              ) AS userRole
          FROM community_post cp
+        WHERE cp.DELETE_YN = 'N'
      ORDER BY cp.CREATE_DT desc
     </select>
 
@@ -45,7 +46,8 @@
         , CREATE_DT AS createDt
         , UPDATE_DT AS updateDt
         FROM community_category
-      ORDER BY sort_order
+       WHERE USE_YN = 'Y'
+       ORDER BY sort_order
     </select>
 
     <update id="updatePostViewCount"
@@ -76,6 +78,7 @@
           JOIN community_post cp
             ON cc.POST_ID = cp.POST_ID
          WHERE cc.POST_ID = #{postId}
+           AND cc.DELETE_YN = 'N'
          ORDER BY cc.CREATE_DT DESC
     </select>
 

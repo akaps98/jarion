@@ -17,9 +17,11 @@ public class CommunityPostVO {
     private String categoryName;
     private String title;
     private String content;
-    private String viewCount;
+    private int viewCount;
+    private String deleteYn;
     private LocalDateTime createDt;
     private LocalDateTime updateDt;
+    private LocalDateTime deleteDt;
 
     // 댓글 갯수
     private int commentCnt;
