@@ -9,7 +9,8 @@ import PostDetail from "./PostDetailPage";
 import Button from "../../common/components/Button";
 import WritePostPage from "./WritePostPage";
 
-const PAGE_SIZE = 5;
+// 한 페이지 당 게시글 갯수
+const PAGE_SIZE = 10;
 
 function CommunityPage() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -124,6 +125,32 @@ function CommunityPage() {
     }
   }
 
+  // 게시글 등록 성공 후 목록으로 돌아가서 재조회
+  async function handleWriteSuccess() {
+    setGoWritePost(false);
+    setSelectedPost(null);
+    setCategory("ALL");
+    setKeyword("");
+    setPage(1);
+
+    try {
+      setLoading(true);
+      setError("");
+  
+      // 게시글 등록 시 게시글 재조회 必
+      const postData = await allPosts();
+      setPosts(postData);
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "목록을 불러오지 못했습니다."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const pageCount = Math.ceil(filteredPosts.length / PAGE_SIZE);
 
   // 한 페이지당 보이는 게시글 수
@@ -190,6 +217,7 @@ function CommunityPage() {
           <WritePostPage
             categories={categories}
             onClose={() => setGoWritePost(false)}
+            onSuccess={() => handleWriteSuccess()}
           />
         ) : selectedPost ? (
           <PostDetail
@@ -248,7 +276,9 @@ function CommunityPage() {
                         <td className="community-title-cell">
                           <button
                             type="button"
-                            className="community-post-link"
+                              className={`community-post-link ${
+                                post.category === "NOTICE" ? "is-notice" : ""
+                              }`}
                             onClick={() => openPost(post)}
                           >
                             {post.title}

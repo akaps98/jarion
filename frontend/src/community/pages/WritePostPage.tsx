@@ -4,27 +4,23 @@ import Button from "../../common/components/Button";
 import "./WritePostPage.css";
 import { checkSession } from "../../common/api/commonApi";
 import { writePost } from "../api/communityApi";
-import { Navigate, useNavigate } from "react-router-dom";
 
 type Category = {
   categoryCode: string;
   categoryName: string;
 };
 
-
-
 type WritePostPageProps = {
   categories: Category[];
   onClose: () => void;
+  onSuccess: () => Promise<void>;
 };
 
-function WritePostPage({ categories, onClose }: WritePostPageProps) {
+function WritePostPage({ categories, onClose, onSuccess }: WritePostPageProps) {
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [userRole, setUserRole] = useState("");
-
-  const navigate = useNavigate()
 
   useEffect(() => {
     // useEffect 콜백은 아무것도 return 불가.
@@ -57,11 +53,11 @@ function WritePostPage({ categories, onClose }: WritePostPageProps) {
 
     try {
       await writePost(category, title, content);
-
-      navigate('/community');
     } catch (error) {
       alert(error instanceof Error ? error.message : "게시글 작성 중 오류가 발생했습니다.");
     }
+
+    await onSuccess();
   }
 
   return (

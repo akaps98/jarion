@@ -331,3 +331,8 @@
   color: #8f3a3a;
   word-break: break-word;
 }
+
+.community-post-link.is-notice {
+  color: #4f46e5;
+  font-weight: 700;
+}
