@@ -36,6 +36,11 @@ function LoginPage() {
 			<div className="login-box">
 
 				<div className="login-title">
+					<img
+						src="/jarion-icon.png"
+						alt="자리온 로고"
+						className="login-logo"
+					/>
 					<h1>JARION</h1>
 					<p>내 자리를 Light On, 자리온</p>
 				</div>

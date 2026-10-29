@@ -103,3 +103,11 @@ body {
 .login-button:hover {
   background-color: #444;
 }
+
+.login-logo {
+	display: block;
+	width: 80px;
+	height: 80px;
+	object-fit: contain;
+	margin: 0 auto 16px;
+}
