@@ -37,7 +37,7 @@ function LoginPage() {
 
 				<div className="login-title">
 					<img
-						src="/jarion-icon.png"
+						src="/jarion-logo.png"
 						alt="자리온 로고"
 						className="login-logo"
 					/>
