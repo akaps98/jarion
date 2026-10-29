@@ -55,6 +55,13 @@ export const commentsForPost = async (postId: string) => {
     return response.json();
 }
 
+/**
+ * 게시글 작성 - userId는 세션에서 꺼내씀
+ * @param category 
+ * @param title 
+ * @param content 
+ */
+
 export const writePost = async (
     category: string,
     title: string,
@@ -62,6 +69,7 @@ export const writePost = async (
 ) => {
     const response = await fetch('/api/community/post', {
         method: "POST",
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
             category: category,
             title: title,

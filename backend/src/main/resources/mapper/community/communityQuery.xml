@@ -82,7 +82,7 @@
          ORDER BY cc.CREATE_DT DESC
     </select>
 
-        <insert id="insertSinglePost"
+    <insert id="insertSinglePost"
             parameterType="com.jarion.community.vo.CommunityPostVO">
         INSERT INTO community_post
              ( USER_ID
