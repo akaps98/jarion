@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Button from '../../common/components/Button';
 import './PostDetailPage.css';
 import { SessionExpiredError } from '../../common/api/apiFetch';
@@ -19,12 +19,9 @@ function PostDetail({
     onSubmitComment
 }: PostDetailProps) {
     const [commentContent, setCommentContent] = useState('');
+    // 댓글 중복 등록 방지용 state
     const [submitting, setSubmitting] = useState(false);
     const [commentError, setCommentError] = useState('');
-
-    useEffect(() => {
-        
-    }, [comments])
 
     async function handleSubmitComment() {
         const content = commentContent.trim();
@@ -34,6 +31,8 @@ function PostDetail({
             return;
         }
 
+        // 댓글 중복 등록 방지
+        // 댓글 등록 중, 시간이 걸릴 경우 유저가 버튼을 한번 더 눌러 두번 이상 등록되는 것을 방지한다.
         if (submitting) return;
 
         try {
