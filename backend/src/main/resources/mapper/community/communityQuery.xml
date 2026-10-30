@@ -66,8 +66,8 @@
              , (SELECT u.USER_NAME
                   FROM users u
                  WHERE u.USER_ID = cc.USER_ID)
-             , cc.PARENT_ID as parentId
             AS userName
+             , cc.PARENT_ID as parentId
              , (SELECT u.USER_ROLE
                   FROM users u
                  WHERE u.USER_ID = cc.USER_ID)
