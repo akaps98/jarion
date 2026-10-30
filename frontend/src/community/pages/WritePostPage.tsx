@@ -32,7 +32,7 @@ function WritePostPage({ categories, onClose, onSuccess }: WritePostPageProps) {
 
       if (!response.ok) {
         // 세션 없음
-        alert("세션 만료. 다시 로그인해주세요.")
+        alert("로그인이 필요합니다.")
         return
       }
 
