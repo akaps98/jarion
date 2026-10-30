@@ -4,6 +4,7 @@ import Button from "../../common/components/Button";
 import "./WritePostPage.css";
 import { checkSession } from "../../common/api/commonApi";
 import { writePost } from "../api/communityApi";
+import { SessionExpiredError } from "../../common/api/apiFetch";
 
 type Category = {
   categoryCode: string;
@@ -54,6 +55,10 @@ function WritePostPage({ categories, onClose, onSuccess }: WritePostPageProps) {
     try {
       await writePost(category, title, content);
     } catch (error) {
+      if (error instanceof SessionExpiredError) {
+        return;
+      }
+
       alert(error instanceof Error ? error.message : "게시글 작성 중 오류가 발생했습니다.");
     }
 

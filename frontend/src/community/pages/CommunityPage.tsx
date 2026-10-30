@@ -8,6 +8,7 @@ import { allPosts, allCategories, updatePostViewCount, commentsForPost } from ".
 import PostDetail from "./PostDetailPage";
 import Button from "../../common/components/Button";
 import WritePostPage from "./WritePostPage";
+import { SessionExpiredError } from "../../common/api/apiFetch";
 
 // 한 페이지 당 게시글 갯수
 const PAGE_SIZE = 10;
@@ -34,21 +35,24 @@ function CommunityPage() {
   useEffect(() => {
     const loadData = async() => {
         try {
-            // 새로고침을 이유로 loading 및 error 문 계속 다시 새로
-            setLoading(true);
-            setError("");
+          // 새로고침을 이유로 loading 및 error 문 계속 다시 새로
+          setLoading(true);
+          setError("");
 
-            // 한 번에 조회; Promise.all 사용
-            const [postData, categoryData] = await Promise.all([
-                allPosts(),
-                allCategories()
-            ])
+          // 한 번에 조회; Promise.all 사용
+          const [postData, categoryData] = await Promise.all([
+              allPosts(),
+              allCategories()
+          ])
 
-            setPosts(postData);
-            setCategories(categoryData);
+          setPosts(postData);
+          setCategories(categoryData);
         } catch (error) {
-            // Error 타입 명시 必
-            setError(error instanceof Error ? error.message : "조회 중 오류가 발생했습니다.")
+          if (error instanceof SessionExpiredError) {
+            return;
+          }
+          // Error 타입 명시 必
+          setError(error instanceof Error ? error.message : "조회 중 오류가 발생했습니다.")
         } finally {
             setLoading(false);
         }
@@ -121,6 +125,11 @@ function CommunityPage() {
       // 상세 화면 열기
       setSelectedPost(updatedPost);
     } catch (error) {
+      // 만약 에러가 SessionExpiredError 객체일시 그냥 return; 에러 대응은 apiFetch 메소드 안에 다 되어있음
+      if (error instanceof SessionExpiredError) {
+        return;
+      }
+
       alert(error instanceof Error ? error.message : "게시글을 여는 중 오류가 발생했습니다.");
     }
   }
@@ -141,6 +150,10 @@ function CommunityPage() {
       const postData = await allPosts();
       setPosts(postData);
     } catch (error) {
+      if (error instanceof SessionExpiredError) {
+        return;
+      }
+
       setError(
         error instanceof Error
           ? error.message
