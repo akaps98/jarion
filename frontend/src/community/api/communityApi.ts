@@ -83,3 +83,25 @@ export const writePost = async (
         throw new Error("게시글 작성에 실패했습니다.");
     }
 }
+
+/**
+ * 댓글 작성 - userId는 세션에서 꺼내씀
+ * @param content 
+ */
+export const writeComment = async (
+    postId: string,
+    content: string
+) => {
+    const response = await apiFetch('/api/community/comment', {
+        method: "POST",
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            postId: postId,
+            content: content
+        })
+    })
+
+    if(!response.ok) {
+        throw new Error("댓글 작성에 실패했습니다.")
+    }
+}

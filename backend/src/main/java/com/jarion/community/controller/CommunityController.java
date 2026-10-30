@@ -107,4 +107,21 @@ public class CommunityController {
 
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/comment")
+    public ResponseEntity<?> insertSingleComment(@RequestBody CommunityCommentVO comment, HttpSession session) {
+        log.debug("=====CommunityController::insertSingleComment=====");
+
+        UserVO loginUser = (UserVO) session.getAttribute("loginUser");
+
+        if(loginUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        comment.setUserId(loginUser.getUserId());
+
+        communityService.insertSingleComment(comment);
+
+        return ResponseEntity.ok().build();
+    }
 }

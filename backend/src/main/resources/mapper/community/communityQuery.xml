@@ -79,7 +79,7 @@
             ON cc.POST_ID = cp.POST_ID
          WHERE cc.POST_ID = #{postId}
            AND cc.DELETE_YN = 'N'
-         ORDER BY cc.CREATE_DT DESC
+         ORDER BY cc.CREATE_DT ASC
     </select>
 
     <insert id="insertSinglePost"
@@ -94,6 +94,20 @@
              ( #{userId}
              , #{category}
              , #{title}
+             , #{content}
+             , NOW() )
+    </insert>
+
+    <insert id="insertSingleComment"
+            parameterType="com.jarion.community.vo.CommunityCommentVO">
+        INSERT INTO community_comment
+             ( POST_ID
+             , USER_ID
+             , CONTENT
+             , CREATE_DT
+             ) VALUES
+             ( #{postId}
+             , #{userId}
              , #{content}
              , NOW() )
     </insert>

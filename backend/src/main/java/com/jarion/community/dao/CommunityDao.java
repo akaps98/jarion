@@ -35,4 +35,8 @@ public class CommunityDao {
     public void insertSinglePost(CommunityPostVO post) {
         sqlSession.insert("insertSinglePost", post);
     }
+
+    public void insertSingleComment(CommunityCommentVO comment) {
+        sqlSession.insert("insertSingleComment", comment);
+    }
 }

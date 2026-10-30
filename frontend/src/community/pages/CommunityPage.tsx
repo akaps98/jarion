@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import "./CommunityPage.css";
-import { allPosts, allCategories, updatePostViewCount, commentsForPost } from "../api/communityApi";
+import { allPosts, allCategories, updatePostViewCount, commentsForPost, writeComment } from "../api/communityApi";
 import PostDetail from "./PostDetailPage";
 import Button from "../../common/components/Button";
 import WritePostPage from "./WritePostPage";
@@ -21,8 +21,6 @@ function CommunityPage() {
   const [category, setCategory] = useState("ALL");
   // 현재 게시글에 달린 댓글
   const [comments, setComments] = useState<any[]>([]);
-  // 현재 작성한 댓글
-  const [comment, setComment] = useState("");
   const [keyword, setKeyword] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -130,11 +128,15 @@ function CommunityPage() {
         return;
       }
 
-      alert(error instanceof Error ? error.message : "게시글을 여는 중 오류가 발생했습니다.");
+      setError(
+        error instanceof Error
+          ? error.message
+          : "게시글을 여는 중 오류가 발생했습니다."
+      );
     }
   }
 
-  // 게시글 등록 성공 후 목록으로 돌아가서 재조회
+  // 게시글 작성 logic
   async function handleWriteSuccess() {
     setGoWritePost(false);
     setSelectedPost(null);
@@ -164,6 +166,34 @@ function CommunityPage() {
     }
   }
 
+  // 댓글 작성 logic
+  async function handleWriteComment(content: string) {
+    const postId = selectedPost?.postId;
+
+    await writeComment(postId, content);
+    const commentsList = await commentsForPost(postId);
+
+    // 댓글 작성 후 댓글 목록 재조회
+    setComments(commentsList);
+
+    // 댓글 작성 후 현재 게시글의 댓글 수 갱신
+    // return 필수; 현재 게시글로
+    setSelectedPost((prevPost: any) => {
+      return prevPost.postId === postId
+      ? {...prevPost, commentCnt: commentsList.length}
+      : prevPost
+    })
+
+    // 댓글 작성 후 모든 게시글 중의 현재 게시글 댓글 수 갱신
+    setPosts((prevPost) => 
+      prevPost.map((item) =>
+        item.postId === postId
+        ? {...item, commentCnt: commentsList.length}
+        : item
+      )
+    )
+  }
+
   const pageCount = Math.ceil(filteredPosts.length / PAGE_SIZE);
 
   // 한 페이지당 보이는 게시글 수
@@ -171,10 +201,6 @@ function CommunityPage() {
     (page - 1) * PAGE_SIZE,
     page * PAGE_SIZE
   );
-
-  // const selectedComments = sampleComments.filter(
-  //   (comment) => comment.postId === selectedPost?.postId
-  // );
 
   // 카테고리 선택 시
   function changeCategory(value: string) {
@@ -202,7 +228,7 @@ function CommunityPage() {
           {error}
         </div>
       ) : (
-            <>
+      <>
         <nav className="community-tabs" aria-label="게시글 카테고리">
           <button
             type="button"
@@ -238,6 +264,7 @@ function CommunityPage() {
             comments={comments}
             getRoleName={getRoleName}
             onClose={() => setSelectedPost(null)}
+            onSubmitComment={handleWriteComment}
           />
         ) : (
           <section className="community-board" aria-label="게시글 목록">
