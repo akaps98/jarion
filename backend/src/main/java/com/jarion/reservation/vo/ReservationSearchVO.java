@@ -5,12 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.DayOfWeek;
+import java.time.LocalDate;
 
 @Getter
 @Setter
 @AllArgsConstructor
 public class ReservationSearchVO {
     private Long boothId;
-    private DayOfWeek dayOfWeek;
+    private LocalDate date;
 }

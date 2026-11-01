@@ -4,7 +4,7 @@ package com.jarion.reservation.vo;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -13,5 +13,5 @@ import java.util.List;
 @Setter
 public class ReservationTimeTableVO {
     private List<ReservationReserveVO> reservations;
-    private DayOfWeek dayOfWeek;
+    private LocalDate date;
 }

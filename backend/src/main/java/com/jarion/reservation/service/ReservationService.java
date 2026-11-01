@@ -7,7 +7,7 @@ import com.jarion.reservation.vo.ReservationReserveVO;
 import com.jarion.reservation.vo.ReservationSearchVO;
 import org.springframework.stereotype.Service;
 
-import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -29,8 +29,8 @@ public class ReservationService {
         return reservationDao.selectAllReservationOfBooths(boothId);
     }
 
-    public List<ReservationReserveVO> selectAllReservationOfBooths(Long boothId, DayOfWeek dayOfWeek){
-        ReservationSearchVO reservationSearchVO = new ReservationSearchVO(boothId, dayOfWeek);
+    public List<ReservationReserveVO> selectAllReservationOfBooths(Long boothId, LocalDate date){
+        ReservationSearchVO reservationSearchVO = new ReservationSearchVO(boothId, date);
         return reservationDao.selectAllReservationOfBooths(reservationSearchVO);
     }
 }

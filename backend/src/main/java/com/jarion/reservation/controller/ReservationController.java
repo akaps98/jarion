@@ -6,14 +6,12 @@ import com.jarion.reservation.vo.ReservationBoothVO;
 import com.jarion.reservation.vo.ReservationReserveVO;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -26,7 +24,7 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
-    @GetMapping("/reservation/allBooths")
+    @GetMapping("/allBooths")
     public ResponseEntity<?> selectAllReservationBooth(HttpSession session){
         log.debug("=====ReservationController::selectAllReservationBooth");
 
@@ -43,7 +41,7 @@ public class ReservationController {
         return ResponseEntity.ok(allBooths);
     }
 
-    @GetMapping("/reservation/allReservations")
+    @GetMapping("/allReservations")
     public ResponseEntity<?> selectAllReservations(HttpSession session){
         log.debug("=====ReservationController::selectAllReservations");
         if(session.getAttribute("loginUser") == null) {
@@ -55,29 +53,17 @@ public class ReservationController {
         return ResponseEntity.ok(allReservations);
     }
 
-    @GetMapping("/reservation/allReservationsOfBooth")
-    public ResponseEntity<?> selectAllReservationsOfBooth(@RequestParam Long boothId, HttpSession session){
+    @GetMapping("/booths/{boothId}/reservations")
+    public ResponseEntity<?> selectAllReservationsOfBooth(@PathVariable Long boothId, @RequestParam(required = false)@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, HttpSession session){
         log.debug("=====ReservationController::selectAllReservationsOfBooth");
 
         if(session.getAttribute("loginUser") == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        List<ReservationReserveVO> allReservations = reservationService.selectAllReservationOfBooths(boothId);
-        return ResponseEntity.ok(allReservations);
+        List<ReservationReserveVO> reservations = date == null
+                ? reservationService.selectAllReservationOfBooths(boothId)
+                : reservationService.selectAllReservationOfBooths(boothId, date);
+        return ResponseEntity.ok(reservations);
     }
-
-    @GetMapping("/reservation/allReservationsOfBoothOfDayOfWeek")
-    public ResponseEntity<?> selectAllReservationsOfBoothOfDayOfWeek(@RequestParam Long boothId, @RequestParam DayOfWeek dayOfWeek, HttpSession session){
-        log.debug("=====ReservationController::selectAllReservationsOfBoothOfDayOfWeek");
-
-        if(session.getAttribute("loginUser") == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        List<ReservationReserveVO> ReservationsOfBoothOfDayOfWeek = reservationService.selectAllReservationOfBooths(boothId, dayOfWeek);
-
-        return ResponseEntity.ok(ReservationsOfBoothOfDayOfWeek);
-    }
-
 }
