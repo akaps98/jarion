@@ -105,3 +105,29 @@ export const writeComment = async (
         throw new Error("댓글 작성에 실패했습니다.")
     }
 }
+
+/**
+ * 대댓글 작성
+ * @param postId
+ * @param content 
+ * @param parentId: 대댓글 쓴 부모 댓글
+ */
+export const writeChildComment = async (
+    postId: string,
+    content: string,
+    parentId: string
+) => {
+    const response = await apiFetch('/api/community/comment/child', {
+        method: "POST",
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            postId: postId,
+            content: content,
+            parentId: parentId
+        })
+    })
+
+    if(!response.ok) {
+        throw new Error("댓글 작성에 실패했습니다.")
+    }
+}

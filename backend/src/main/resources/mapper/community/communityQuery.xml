@@ -60,19 +60,20 @@
     <select id="selectCommentsOnPost"
             resultType="com.jarion.community.vo.CommunityCommentVO"
             parameterType="string">
-        SELECT cc.COMMENT_ID as commentId
-             , cc.POST_ID as postId
-             , cc.USER_ID as userId
+        SELECT cc.COMMENT_ID AS commentId
+             , cc.POST_ID AS postId
+             , cc.USER_ID AS userId
              , (SELECT u.USER_NAME
                   FROM users u
                  WHERE u.USER_ID = cc.USER_ID)
             AS userName
-             , cc.PARENT_ID as parentId
+             , cc.PARENT_ID AS parentId
              , (SELECT u.USER_ROLE
                   FROM users u
                  WHERE u.USER_ID = cc.USER_ID)
             AS userRole
-             , cc.CONTENT as content
+             , cc.depth AS depth
+             , cc.CONTENT AS content
              , cc.CREATE_DT AS createDt
              , cc.UPDATE_DT AS updateDt
           FROM community_comment cc
@@ -111,5 +112,25 @@
              , #{userId}
              , #{content}
              , NOW() )
+    </insert>
+
+    <insert id="insertChildComment"
+            parameterType="com.jarion.community.vo.CommunityCommentVO">
+        INSERT INTO community_comment
+             ( POST_ID
+             , USER_ID
+             , PARENT_ID
+             , DEPTH
+             , CONTENT
+             , CREATE_DT
+             ) SELECT
+             parent.POST_ID
+             , #{userId}
+             , parent.COMMENT_ID
+             , parent.DEPTH + 1
+             , #{content}
+             , NOW()
+             FROM community_comment parent
+             WHERE parent.COMMENT_ID = #{parentId}
     </insert>
 </mapper>

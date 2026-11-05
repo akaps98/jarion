@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import "./CommunityPage.css";
-import { allPosts, allCategories, updatePostViewCount, commentsForPost, writeComment } from "../api/communityApi";
+import { allPosts, allCategories, updatePostViewCount, commentsForPost, writeComment, writeChildComment } from "../api/communityApi";
 import PostDetail from "./PostDetailPage";
 import Button from "../../common/components/Button";
 import WritePostPage from "./WritePostPage";
@@ -194,6 +194,31 @@ function CommunityPage() {
     )
   }
 
+  // 대댓글 작성 logic
+  async function handleWriteChildComment(comment: string, parentId: string) {
+    const postId = selectedPost?.postId;
+
+    await writeChildComment(postId, comment, parentId);
+    const commentsList = await commentsForPost(postId);
+
+    // 위에 댓글 쓴 뒤 댓글 및 게시글 reload 하는 로직과 같음
+    setComments(commentsList);
+
+    setSelectedPost((prevPost: any) => {
+      return prevPost.postId === postId
+      ? {...prevPost, commentCnt: commentsList.length}
+      : prevPost
+    })
+
+    setPosts((prevPost) => 
+      prevPost.map((item) => 
+        item.postId === postId
+        ? {...item, commentCnt: commentsList.length}
+        : item
+      )
+    )
+  }
+
   const pageCount = Math.ceil(filteredPosts.length / PAGE_SIZE);
 
   // 한 페이지당 보이는 게시글 수
@@ -265,6 +290,7 @@ function CommunityPage() {
             getRoleName={getRoleName}
             onClose={() => setSelectedPost(null)}
             onSubmitComment={handleWriteComment}
+            onSubmitReply={handleWriteChildComment}
           />
         ) : (
           <section className="community-board" aria-label="게시글 목록">

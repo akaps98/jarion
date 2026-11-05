@@ -16,6 +16,7 @@ public class CommunityCommentVO {
     // 댓글 쓴 사람 역할
     private String userRole;
     private String parentId;
+    private int depth;
     private String content;
     private String deleteYn;
     private LocalDateTime createDt;

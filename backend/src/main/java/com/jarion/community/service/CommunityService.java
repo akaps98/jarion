@@ -44,4 +44,9 @@ public class CommunityService {
     public void insertSingleComment(CommunityCommentVO comment) {
         communityDao.insertSingleComment(comment);
     }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void insertChildComment(CommunityCommentVO comment) {
+        communityDao.insertChildComment(comment);
+    }
 }
