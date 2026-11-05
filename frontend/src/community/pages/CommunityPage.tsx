@@ -3,6 +3,7 @@
  */
 
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./CommunityPage.css";
 import { allPosts, allCategories, updatePostViewCount, commentsForPost, writeComment, writeChildComment } from "../api/communityApi";
 import PostDetail from "./PostDetailPage";
@@ -29,6 +30,8 @@ function CommunityPage() {
   const [selectedPost, setSelectedPost] = useState<any | null>(null);
   // 글쓰기 페이지
   const [goWritePost, setGoWritePost] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadData = async() => {
@@ -58,6 +61,27 @@ function CommunityPage() {
 
     loadData();
   }, [])
+
+  async function handleOpenWritePost() {
+      try {
+          const response = await fetch('/api/auth/session');
+
+          // 로그인 하지않고 글쓰기 버튼 클릭 시 로그인 화면으로
+          if (response.status === 401) {
+              alert('로그인이 필요합니다.');
+              navigate('/login');
+              return;
+          }
+
+          setGoWritePost(true);
+      } catch (error) {
+          alert(
+              error instanceof Error
+                  ? error.message
+                  : '로그인 상태를 확인하지 못했습니다.'
+          );
+      }
+  }
 
   // 카테고리 변경 or 검색 시
   const filteredPosts = useMemo(() => {
@@ -312,7 +336,7 @@ function CommunityPage() {
               />
             </div>
             <div className="post-actions">
-              <Button onClick={() => setGoWritePost(true)}>글쓰기</Button>
+              <Button onClick={handleOpenWritePost}>글쓰기</Button>
             </div>
             <div className="community-table-wrap">
               <table className="community-table">

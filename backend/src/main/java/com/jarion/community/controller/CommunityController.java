@@ -28,9 +28,10 @@ public class CommunityController {
     public ResponseEntity<?> selectAllCommunityPosts(HttpSession session) {
         log.debug("=====CommunityController::selectAllCommunityPosts=====");
 
-        if(session.getAttribute("loginUser") == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        // 세션 없어도 게시글 확인 가능
+//        if(session.getAttribute("loginUser") == null) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
 
         List<CommunityPostVO> allPosts = communityService.selectAllCommunityPosts();
 
@@ -45,10 +46,6 @@ public class CommunityController {
     public ResponseEntity<?> selectAllCommunitycategories(HttpSession session) {
         log.debug("=====CommunityController::selectAllCommunitycategories=====");
 
-        if(session.getAttribute("loginUser") == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
         List<CommunityCategoryVO> allCategories = communityService.selectAllCommunityCategories();
 
         if (allCategories.isEmpty()) {
@@ -62,10 +59,6 @@ public class CommunityController {
     public ResponseEntity<?> updatePostViewCount(@RequestBody String postId, HttpSession session) {
         log.debug("=====CommunityController::updatePostViewCount=====");
 
-        if(session.getAttribute("loginUser") == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
         communityService.updatePostViewCount(postId);
 
         return ResponseEntity.ok().build();
@@ -76,10 +69,6 @@ public class CommunityController {
     @GetMapping("/post/comment")
     public ResponseEntity<?> selectCommentsOnPost(@RequestParam String postId, HttpSession session) {
         log.debug("=====CommunityController::selectCommentsOnPost=====");
-
-        if(session.getAttribute("loginUser") == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
 
         List<CommunityCommentVO> comments = communityService.selectCommentsOnPost(postId);
 

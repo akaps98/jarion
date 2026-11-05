@@ -24,7 +24,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/**")
                 .excludePathPatterns(
                         "/api/auth/**",
-                        "/api/test"
+                        // 로그인 안해도 게시글, 댓글 확인 가능 -> interceptor 무시
+                        "/api/community/post/all",
+                        "/api/community/category/all",
+                        "/api/community/post/comment",
+                        "/api/community/post/viewcount"
                 );
     }
 }

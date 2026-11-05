@@ -7,34 +7,38 @@ import MainLayout from "../common/layouts/MainLayout";
 import MyPage from "../community/pages/MyPage";
 
 const router = createBrowserRouter([
-	{
-		path: '/',
-		element: <LoginPage />,
-	},
-	{
-        // Session 있을때만 해당 페이지 접속 가능하도록 변경
-		element: <CheckSessionRoute />,
-		children: [
-			{
-                // MainLayout의 outlet(children)들 생성
-				element: <MainLayout />,
-				children: [
-					{
-						path: '/community',
-						element: <CommunityPage />,
-					},
-					{
-						path: '/reservation',
-						element: <ReservationPage />,
-					},
-					{
-						path: '/mypage',
-						element: <MyPage />	
-					}
-				],
-			},
-		],
-	},
-])
+    {
+        path: "/login",
+        element: <LoginPage />,
+    },
+    {
+        element: <MainLayout />,
+        children: [
+            // 메인 화면 -> 커뮤니티
+            {
+                path: "/",
+                element: <CommunityPage />,
+            },
+            {
+                path: "/community",
+                element: <CommunityPage />,
+            },
+            {
+                path: "/reservation",
+                element: <ReservationPage />,
+            },
+            // 세션 필요 화면
+            {
+                element: <CheckSessionRoute />,
+                children: [
+                    {
+                        path: "/mypage",
+                        element: <MyPage />,
+                    },
+                ],
+            },
+        ],
+    },
+]);
 
 export default router;

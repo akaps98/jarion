@@ -5,7 +5,7 @@ import { apiFetch } from "../../common/api/apiFetch";
  * @returns List<CommunityPostVO>
  */
 export const allPosts = async () => {
-    const response = await apiFetch('/api/community/post/all')
+    const response = await fetch('/api/community/post/all')
 
     if(!response.ok) {
         throw new Error("게시글을 불러오지 못했습니다.");
@@ -19,7 +19,7 @@ export const allPosts = async () => {
  * @returns List<CommunityCategoryVO>
  */
 export const allCategories = async () => {
-    const response = await apiFetch('/api/community/category/all')
+    const response = await fetch('/api/community/category/all')
 
     if(!response.ok) {
         throw new Error("카테고리를 불러오지 못했습니다.");
@@ -32,7 +32,7 @@ export const allCategories = async () => {
  * 게시글 읽을 시, 조회수 올림
  */
 export const updatePostViewCount = async (postId: string) => {
-    const response = await apiFetch('/api/community/post/viewcount', {
+    const response = await fetch('/api/community/post/viewcount', {
         method: "POST",
         body: postId
     });
@@ -48,7 +48,7 @@ export const updatePostViewCount = async (postId: string) => {
  * @returns List<CommunityCommentVO>
  */
 export const commentsForPost = async (postId: string) => {
-    const response = await apiFetch(`/api/community/post/comment?postId=${encodeURIComponent(postId)}`)
+    const response = await fetch(`/api/community/post/comment?postId=${encodeURIComponent(postId)}`)
 
     if(!response.ok) {
         throw new Error("댓글을 불러오지 못했습니다.");

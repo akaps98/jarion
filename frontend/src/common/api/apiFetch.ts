@@ -29,7 +29,7 @@ export async function apiFetch(
 
       // alert 띄우고 로그인 페이지로 redirect
       alert("로그인이 필요합니다.")
-      window.location.replace("/");
+      window.location.replace("/login");
     }
 
     throw new SessionExpiredError();

@@ -50,7 +50,7 @@ function CheckSessionRoute() {
 
     // 로그인 안 됨
     if (!isAuthenticated) {
-        return <Navigate to="/" replace />
+        return <Navigate to="/login" replace />
     }
 
     // 로그인 됨
