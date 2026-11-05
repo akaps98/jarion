@@ -308,7 +308,7 @@
 
 /* 댓글 한 단계당 들여쓰기 간격 */
 .community-comments {
-    --comment-indent: 20px;
+    --comment-indent: 40px;
 }
 
 /* 들여쓴 만큼 댓글 너비가 줄어들도록 처리 */

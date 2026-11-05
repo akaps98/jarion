@@ -3,6 +3,9 @@ import Button from '../../common/components/Button';
 import './PostDetailPage.css';
 import { SessionExpiredError } from '../../common/api/apiFetch';
 
+// depth 10까지
+var maxDepth = 10;
+
 type PostDetailProps = {
     post: any;
     comments: any[];
@@ -26,16 +29,16 @@ function PostDetail({
     const [commentContent, setCommentContent] = useState('');
     const [commentError, setCommentError] = useState('');
 
-    // 일반 댓글과 답글 등록 중 중복 요청 방지
+    // 댓글&대댓글 중복 요청 방지
     const [submitting, setSubmitting] = useState(false);
 
-    // 답글 입력창
+    // 대댓글
     const [replyTargetId, setReplyTargetId] = useState<string | null>(null);
     const [replyContent, setReplyContent] = useState('');
     const [replyError, setReplyError] = useState('');
 
-    // 부모 댓글 바로 아래에 해당 답글들을 배치
-    // 들여쓰기 깊이는 DB에서 받은 depth 사용
+    // 부모 댓글 바로 아래에 대댓글들 배치; 들여쓰기
+    // 들여쓰기 깊이는 depth로 따짐
     const displayComments = useMemo(() => {
         const list = comments.map((comment) => ({
             ...comment,
@@ -94,13 +97,6 @@ function PostDetail({
         }
 
         roots.forEach(appendThread);
-
-        // 비정상적인 부모 관계가 있어도 댓글 누락 방지
-        list.forEach((comment) => {
-            if (!visited.has(comment.commentId)) {
-                appendThread(comment);
-            }
-        });
 
         return result;
     }, [comments]);
@@ -277,10 +273,9 @@ function PostDetail({
                         const isReplyOpen =
                             replyTargetId === comment.commentId;
 
-                        // depth 6 이상도 5단계와 같은 위치에 표시
                         const visibleDepth = Math.min(
                             comment.depth,
-                            5
+                            maxDepth
                         );
 
                         return (
