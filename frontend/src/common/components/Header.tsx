@@ -12,6 +12,9 @@ function Header() {
     const [loggingOut, setLoggingOut] = useState(false);
 
     useEffect(() => {
+		// Header가 사라질 시(ex. 로그인 화면 이동), 비동기 작업 취소 시 사용
+		// 지금같은 경우에는 로그인 화면 이동 시, 세션 조회가 만약 진행중이라면 그 요청 끊고 넘어가기 위해 사용
+		// 꼭 필수까진 아니나, UX 효율 향상을 위해 사용
         const controller = new AbortController();
 
         const checkUserInfo = async () => {
@@ -49,6 +52,7 @@ function Header() {
 
         void checkUserInfo();
 
+		// 헤더 사라질 시(unmount) 실행
         return () => controller.abort();
     }, []);
 
