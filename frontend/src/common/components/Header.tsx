@@ -85,7 +85,11 @@ function Header() {
                     className="header-logo"
                     onClick={() => navigate('/')}
                 >
-                    자리온
+					<img
+						src="/jarion-logo.png"
+						alt="자리온"
+						className="header-logo-image"
+					/>
                 </button>
 
                 <nav className="header-nav" aria-label="메인 메뉴">
