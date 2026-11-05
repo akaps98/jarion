@@ -365,3 +365,8 @@
     white-space: normal;
     overflow-wrap: anywhere;
 }
+
+.community-detail .community-badge.NOTICE {
+    background: #e9edff;
+    color: #5865e8;
+}
