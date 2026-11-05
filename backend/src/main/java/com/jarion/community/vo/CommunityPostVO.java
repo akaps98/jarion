@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class CommunityPostVO {
-    private Long postId;
+    private String postId;
     private String userId;
     // 게시글 쓴 사람
     private String userName;
