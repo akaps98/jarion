@@ -9,10 +9,14 @@ import java.util.List;
 @Setter
 public class ReservationBoothVO {
     private Long boothId;
+    private Long eventId;
+    private Integer positionRow;
+    private Integer positionCol;
     private String boothName;
-    private String userId;
-    private String userName;
 
+    //선택 날짜의 사진사.
+    private Long userId;
+    private String userName;
     private boolean isUsing;
     private List<ReservationTimeTableVO> timeTable;
 }

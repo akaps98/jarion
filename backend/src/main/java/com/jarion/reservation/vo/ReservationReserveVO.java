@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 public class ReservationReserveVO {
     private Long reservationId;
     private Long boothId;
-    private String userId;
+    private Long userId;
+    private Long occupancyId;
     private String userName;
 
     private LocalDateTime startTime;

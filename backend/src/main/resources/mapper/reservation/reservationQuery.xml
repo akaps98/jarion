@@ -4,7 +4,84 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="reservation">
-
     <!-- 여기에 select, insert, update, delete 작성 -->
+    <insert id="insertEvent"
+            parameterType="com.jarion.reservation.vo.ReservationEventVO"
+            useGeneratedKeys="true"
+            keyProperty="eventId">
+        INSERT INTO reservation_event (
+        EVENT_NAME,
+        LOCATION
+        )
+        VALUES (
+        #{eventName},
+        #{location}
+        )
+    </insert>
+
+    <insert id="insertEventDay"
+            parameterType="com.jarion.reservation.vo.ReservationEventDayVO"
+            useGeneratedKeys="true"
+            keyProperty="eventDayId">
+        INSERT INTO reservation_event_day (
+        EVENT_ID,
+        EVENT_DATE,
+        OPEN_TIME,
+        CLOSE_TIME
+        )
+        VALUES (
+        #{eventId},
+        #{eventDate},
+        #{openTime},
+        #{closeTime}
+        )
+    </insert>
+
+    <insert id="insertBooth"
+            parameterType="com.jarion.reservation.vo.ReservationBoothVO"
+            useGeneratedKeys="true"
+            keyProperty="boothId">
+        INSERT INTO reservation_booth (
+        BOOTH_NAME,
+        EVENT_ID,
+        POSITION_ROW,
+        POSITION_COL
+        )
+        VALUES (
+        #{boothName},
+        #{eventId},
+        #{positionRow},
+        #{positionCol}
+        )
+    </insert>
+
+    <select id="selectEvents"
+            resultType="com.jarion.reservation.vo.ReservationEventVO">
+        SELECT EVENT_ID, EVENT_NAME, LOCATION, CREATE_DT, UPDATE_DT
+        FROM reservation_event
+        WHERE DELETE_YN = 'N'
+    </select>
+
+    <select id="selectEventById"
+            parameterType="long"
+            resultType="com.jarion.reservation.vo.ReservationEventVO">
+        SELECT EVENT_ID, EVENT_NAME, LOCATION
+        FROM reservation_event
+        WHERE DELETE_YN = 'N'
+        AND EVENT_ID = #{eventId}
+    </select>
+
+    <select id="selectEventDays"
+            parameterType="long"
+            resultType="com.jarion.reservation.vo.ReservationEventDayVO">
+        SELECT EVENT_DAY_ID,
+                EVENT_ID,
+                EVENT_DATE,
+                OPEN_TIME,
+                CLOSE_TIME
+        FROM reservation_event_day
+        WHERE EVENT_ID = #{eventId}
+        ORDER BY EVENT_DATE
+    </select>
 
 </mapper>
