@@ -66,4 +66,5 @@ public class ReservationController {
                 : reservationService.selectAllReservationOfBooths(boothId, date);
         return ResponseEntity.ok(reservations);
     }
+
 }
