@@ -6,7 +6,7 @@
 
   max-width: 1120px;
   margin: 0 auto;
-  padding: 48px 24px 80px;
+  padding: 24px 24px 60px;
   color: var(--text);
 }
 
@@ -31,10 +31,8 @@
 }
 
 .community-hero {
-  padding: 40px;
-  border: 1px solid #e9eaff;
-  border-radius: 20px;
-  background: linear-gradient(120deg, #f0f2ff, #faf5ff);
+  padding: 0 0 10px;
+  border-bottom: 2px solid var(--primary);
 }
 
 .community-eyebrow {
@@ -45,10 +43,10 @@
 }
 
 .community-hero h1 {
-  margin: 14px 0 12px;
-  font-size: clamp(24px, 4vw, 34px);
+  margin: 0;
+  font-size: 21px;
   line-height: 1.4;
-  letter-spacing: -1px;
+  letter-spacing: 0;
 }
 
 .community-hero p {
@@ -60,7 +58,7 @@
 .community-tabs {
   display: flex;
   gap: 8px;
-  margin: 30px 0 24px;
+  margin: 16px 0;
   padding-bottom: 5px;
   overflow-x: auto;
 }

@@ -2,9 +2,12 @@ package com.jarion.reservation.service;
 
 
 import com.jarion.reservation.dao.ReservationDao;
+import com.jarion.reservation.utils.validator.ReservationEventValidator;
 import com.jarion.reservation.vo.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -12,8 +15,14 @@ import java.util.List;
 @Service
 public class ReservationService {
     private final ReservationDao reservationDao;
+    private final ReservationEventValidator reservationEventValidator;
 
-    public ReservationService(ReservationDao reservationDao){ this.reservationDao = reservationDao; }
+    public ReservationService(
+            ReservationDao reservationDao,
+            ReservationEventValidator reservationEventValidator) {
+        this.reservationDao = reservationDao;
+        this.reservationEventValidator = reservationEventValidator;
+    }
 
 
     public List<ReservationBoothVO> selectAllReservationBooths(){
@@ -35,6 +44,9 @@ public class ReservationService {
 
     @Transactional
     public Long createEvent(ReservationEventCreateVO requestParam){
+        // 0. 행사 검증
+        reservationEventValidator.validate(requestParam);
+
         // 1. 행사 등록
         ReservationEventVO event = new ReservationEventVO();
         event.setEventName(requestParam.getEventName());
@@ -66,7 +78,26 @@ public class ReservationService {
         return eventId;
     }
 
-    public List<ReservationEventVO> selectAllReservationEvent(){
+    public List<ReservationEventVO> selectAllReservationEvent() {
         return reservationDao.selectAllReservationEvent();
+    }
+
+    public ReservationEventDetailVO getEventDetail(Long eventId){
+        ReservationEventVO event = reservationDao.selectEventById(eventId);
+
+        if(event == null){
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "행사를 찾을 수 없습니다."
+            );
+        }
+        List<ReservationEventDayVO> days = reservationDao.selectEventDays(eventId);
+
+        ReservationEventDetailVO detail = new ReservationEventDetailVO();
+        detail.setEventId(event.getEventId());
+        detail.setEventName(event.getEventName());
+        detail.setLocation(event.getLocation());
+        detail.setDays(days);
+        return detail;
     }
 }

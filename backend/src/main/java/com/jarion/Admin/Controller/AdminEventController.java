@@ -5,6 +5,7 @@ import com.jarion.common.vo.UserVO;
 import com.jarion.reservation.service.ReservationService;
 import com.jarion.reservation.vo.ReservationEventCreateVO;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class AdminEventController {
 
     @PostMapping("/events")
     public ResponseEntity<?> createEvent(
-            @RequestBody ReservationEventCreateVO requestParam,
+            @Valid @RequestBody ReservationEventCreateVO requestParam,
             HttpSession session){
         UserVO loginUser = (UserVO) session.getAttribute("loginUser");
         if(loginUser == null){

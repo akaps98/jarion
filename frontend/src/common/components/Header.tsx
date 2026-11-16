@@ -7,6 +7,7 @@ function Header() {
     const navigate = useNavigate();
 
     const [userName, setUserName] = useState('');
+    const [userRole, setUserRole] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [sessionLoading, setSessionLoading] = useState(true);
     const [loggingOut, setLoggingOut] = useState(false);
@@ -36,6 +37,7 @@ function Header() {
                 if (controller.signal.aborted) return;
 
                 setUserName(data.userName ?? '');
+                setUserRole(data.userRole ?? '');
                 setIsLoggedIn(true);
             } catch (error) {
                 if (controller.signal.aborted) return;
@@ -110,6 +112,11 @@ function Header() {
                     >
                         예약
                     </button>
+                    {isLoggedIn && userRole === 'ADMIN' && (
+                        <button type="button" onClick={() => navigate('/admin')}>
+                            행사 관리
+                        </button>
+                    )}
                 </nav>
 
 				{!sessionLoading && (

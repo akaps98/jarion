@@ -261,9 +261,7 @@ function CommunityPage() {
   return (
     <main className="community">
       <header className="community-hero">
-        <span className="community-eyebrow">JARION COMMUNITY</span>
-        <h1>촬영의 설렘을 함께 나눠요</h1>
-        <p>함께할 사람을 찾고, 촬영 경험과 이야기를 나누는 공간</p>
+        <h1>커뮤니티</h1>
       </header>
       
 

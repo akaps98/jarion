@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { booths, hours, time, localDate } from '../demoData';
 import { useEffect } from 'react';
 import type { Booking, Status } from '../demoData';
@@ -48,7 +48,7 @@ export default function ReservationPage() {
   }
   return <div className="rv-page">
     <div className="rv-notice"><strong>인터랙티브 데모</strong> 예시 부스와 사진사입니다. 실제 저장되지 않으며 새로고침하면 초기화됩니다.</div>
-    <header className="rv-heading"><div><p className="rv-eyebrow">FIND YOUR SPOT</p><h1>설레는 촬영, 여기서 시작해요<span>.</span></h1><p>마음에 드는 부스와 사진사를 만나 나만의 순간을 남겨보세요.</p></div><span className="rv-brand">JARION RESERVATION</span></header>
+    <header className="rv-heading"><div><p className="rv-eyebrow">FIND YOUR SPOT</p><h1>부스 예약</h1><p>날짜와 부스를 선택한 뒤 촬영 시간을 확인하세요.</p></div><span className="rv-brand">JARION RESERVATION</span></header>
     <div className="rv-mode" aria-label="데모 역할 선택">{(['USER', 'PHOTO'] as const).map(role => <button key={role} aria-pressed={mode === role} onClick={() => { setMode(role); reset(); }}>{role === 'USER' ? '코스어 예약 체험' : '사진사 점유·관리 체험'}</button>)}</div>
     <div className="rv-workspace">
       <section className="rv-panel" aria-labelledby="rv-map-title">
@@ -63,7 +63,7 @@ export default function ReservationPage() {
         <div className="rv-legend"><span><i className="occupied" />사진사 있음</span><span><i className="empty" />미점유</span><span><i className="selected" />선택한 부스</span></div><p className="rv-caption">4 × 4 예시 배치 · 실제 행사장 배치와는 다를 수 있어요.</p>
       </section>
       <aside className="rv-panel rv-summary" aria-labelledby="rv-summary-title"><span className="rv-step">STEP 02</span><h2 id="rv-summary-title">{mode === 'PHOTO' ? '하루 점유 확인' : '촬영 시간 선택'}</h2>
-        {!selected ? <div className="rv-placeholder"><span aria-hidden="true">▦</span><h3>어떤 자리에서 만날까요?</h3><p>{mode === 'PHOTO' ? '배치도에서 빈 부스를 선택해주세요.' : '사진사가 있는 부스를 선택해주세요.'}</p></div> : <>
+        {!selected ? <div className="rv-placeholder"><span aria-hidden="true">▦</span><h3>부스를 선택해주세요</h3><p>{mode === 'PHOTO' ? '배치도에서 빈 부스를 선택해주세요.' : '사진사가 있는 부스를 선택해주세요.'}</p></div> : <>
           <div className="rv-info"><span>{selected.name}</span><div><strong>{mode === 'PHOTO' ? '하루 동안 나의 촬영 공간' : `${photographer(selected.id)} 작가`}</strong><p>{selected.concept}</p></div></div>
           <dl className="rv-details"><div><dt>촬영 날짜</dt><dd>{date}</dd></div><div><dt>이용 단위</dt><dd>{mode === 'PHOTO' ? '하루' : '1시간'}</dd></div></dl>
           {mode === 'USER' && <><h3 className="rv-slot-title">촬영 시작 시간</h3><div className="rv-times">{hours.map(h => <button key={h} disabled={blocked(h)} aria-pressed={hour === h} onClick={() => setHour(h)}>{time(h)}<small>{blocked(h) ? '선택 불가' : '예약 가능'}</small></button>)}</div><p className="rv-fine">신청 즉시 시간이 선점되고, 사진사 수락 후 예약이 확정돼요.</p></>}

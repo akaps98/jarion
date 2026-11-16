@@ -5,6 +5,7 @@ import CommunityPage from "../community/pages/CommunityPage";
 import CheckSessionRoute from "../common/components/CheckSessionRoute";
 import MainLayout from "../common/layouts/MainLayout";
 import MyPage from "../community/pages/MyPage";
+import AdminEventPage from "../admin/pages/AdminEventPage";
 
 const router = createBrowserRouter([
     {
@@ -23,10 +24,6 @@ const router = createBrowserRouter([
                 path: "/community",
                 element: <CommunityPage />,
             },
-            {
-                path: "/reservation",
-                element: <ReservationPage />,
-            },
             // 세션 필요 화면
             {
                 element: <CheckSessionRoute />,
@@ -35,6 +32,14 @@ const router = createBrowserRouter([
                         path: "/mypage",
                         element: <MyPage />,
                     },
+                    {
+                        path: "/reservation",
+                        element: <ReservationPage />,
+                    },
+                    {
+                        path: "/admin",
+                        element: <AdminEventPage />,
+                    }
                 ],
             },
         ],

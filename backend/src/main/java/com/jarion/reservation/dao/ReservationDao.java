@@ -49,4 +49,12 @@ public class ReservationDao {
         return sqlSession.selectList("reservation.selectEvents");
     }
 
+    public ReservationEventVO selectEventById(Long eventId){
+        return sqlSession.selectOne("reservation.selectEventById", eventId);
+    }
+
+    public List<ReservationEventDayVO> selectEventDays(Long eventId){
+        return sqlSession.selectList("reservation.selectEventDays", eventId);
+    }
+
 }
