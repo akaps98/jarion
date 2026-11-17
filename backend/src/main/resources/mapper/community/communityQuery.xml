@@ -133,4 +133,19 @@
         FROM community_comment parent
         WHERE parent.COMMENT_ID = #{parentId}
     </insert>
+
+    <select id="findOwnPost"
+            parameterType="com.jarion.community.vo.CommunityPostVO">
+        select count(cp.POST_ID)
+        from community_post cp
+        where cp.USER_ID = #{userId}
+        and cp.POST_ID = #{postId}
+    </select>
+
+    <update id="deleteSinglePost"
+            parameterType="string">
+        UPDATE community_post
+           SET DELETE_YN = 'Y'
+         WHERE POST_ID = #{postId}
+    </update>
 </mapper>

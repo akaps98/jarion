@@ -130,4 +130,55 @@ public class CommunityController {
 
         return ResponseEntity.ok().build();
     }
+
+    // 삭제 버튼 띄우기 위한 용도
+    @GetMapping("/post/ownPost")
+    public ResponseEntity<?> findOwnPost(@RequestBody String postId, HttpSession session) {
+        log.debug("=====CommunityController::findOwnPost=====");
+
+        UserVO loginUser = (UserVO) session.getAttribute("loginUser");
+
+        // 로그인 하지 않은 유저도 게시글 조회 가능
+        // 해당 단계에서 UNAUTHORIZED 띄울 시 로직에 맞지 않음
+//        if(loginUser == null) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
+
+        CommunityPostVO postVO = new CommunityPostVO();
+
+        postVO.setUserId(loginUser.getUserId());
+        postVO.setPostId(postId);
+
+        // 0: 본인의 게시글 아님
+        // 1: 본인의 게시글임
+        int checkOwnPost = communityService.findOwnPost(postVO);
+
+        return ResponseEntity.ok(checkOwnPost);
+    }
+
+    @PostMapping("/post/delete")
+    public ResponseEntity<?> deleteSinglePost(@RequestBody String postId, HttpSession session) {
+        log.debug("=====CommunityController::deleteSinglePost=====");
+
+        UserVO loginUser = (UserVO) session.getAttribute("loginUser");
+
+        if(loginUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        CommunityPostVO postVO = new CommunityPostVO();
+
+        postVO.setUserId(loginUser.getUserId());
+        postVO.setPostId(postId);
+
+        // 현재 로그인한 사용자가 작성한 게시글의 작성자일 경우; 삭제 가능
+        if (communityService.findOwnPost(postVO) > 0) {
+            communityService.deleteSinglePost(postId);
+
+            return ResponseEntity.ok().build();
+        }
+
+        // 현재 로그인한 사용자가 작성한 게시글의 작성자가 아닐 경우; 삭제 불가
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
 }

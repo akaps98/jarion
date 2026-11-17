@@ -131,3 +131,42 @@ export const writeChildComment = async (
         throw new Error("댓글 작성에 실패했습니다.")
     }
 }
+
+/**
+ * 본인의 게시글인지 확인
+ * '삭제'버튼 띄우기 위한 용도
+ * @param postId 
+ */
+export const findOwnPost = async (
+    postId: string
+) => {
+    const response = await apiFetch('/api/community/post/ownPost', {
+        method: "POST",
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            postId: postId
+        })
+    })
+
+    return response.json() as Promise<number>;
+}
+
+/**
+ * 게시글 삭제; 본인이 작성한 게시글만 가능
+ * @param postId 
+ */
+export const deleteSinglePost = async (
+    postId: string
+) => {
+    const response = await apiFetch('/api/community/post/delete', {
+        method: "POST",
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            postId: postId
+        })
+    })
+
+    if(!response.ok) {
+        throw new Error("게시글 삭제에 실패했습니다.")
+    }
+}

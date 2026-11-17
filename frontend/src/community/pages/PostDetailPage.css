@@ -370,3 +370,48 @@
     background: #e9edff;
     color: #5865e8;
 }
+
+.community-detail-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.community-detail-actions .community-back {
+    margin-bottom: 0;
+}
+
+.community-post-delete {
+    margin-left: auto;
+    padding: 6px 10px;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    background: #fff;
+    color: #b91c1c;
+    font: inherit;
+    font-size: 13px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.community-post-delete:hover:not(:disabled) {
+    background: #fef2f2;
+}
+
+.community-post-delete:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.community-post-meta-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 12px;
+}
+
+.community-post-meta-row .community-post-delete {
+    margin-left: auto;
+    flex-shrink: 0;
+}

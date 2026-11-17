@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CommunityPage.css";
-import { allPosts, allCategories, updatePostViewCount, commentsForPost, writeComment, writeChildComment } from "../api/communityApi";
+import { allPosts, allCategories, updatePostViewCount, commentsForPost, writeComment, writeChildComment, findOwnPost, deleteSinglePost } from "../api/communityApi";
 import PostDetail from "./PostDetailPage";
 import Button from "../../common/components/Button";
 import WritePostPage from "./WritePostPage";
@@ -28,10 +28,42 @@ function CommunityPage() {
   const [page, setPage] = useState(1);
   // 클릭한 게시글
   const [selectedPost, setSelectedPost] = useState<any | null>(null);
+  // 본인의 게시글인가?
+  const [ownedPostId, setOwnedPostId] = useState<any | null>(null);
   // 글쓰기 페이지
   const [goWritePost, setGoWritePost] = useState(false);
 
   const navigate = useNavigate();
+
+  const selectedPostId = selectedPost?.postId == null ? null : String(selectedPost.postId);
+
+  useEffect(() => {
+    if (selectedPostId === null) return;
+
+    const postId = selectedPostId;
+    let active = true;
+
+    async function checkOwnership() {
+      try {
+        const sessionResponse = await fetch("/api/auth/session");
+        if (!active || !sessionResponse.ok) return;
+
+        const isOwnPost = await findOwnPost(postId);
+
+        if (active) {
+          setOwnedPostId(isOwnPost === 1 ? postId : null);
+        }
+      } catch {
+        // 작성자 확인에 실패하면 삭제 버튼을 숨긴 상태로 유지
+      }
+    }
+
+    void checkOwnership();
+
+    return () => {
+      active = false;
+    };
+  }, [selectedPostId]);
 
   useEffect(() => {
     const loadData = async() => {
@@ -158,6 +190,25 @@ function CommunityPage() {
           : "게시글을 여는 중 오류가 발생했습니다."
       );
     }
+  }
+
+  async function handleDeleteSelectedPost() {
+    if (selectedPostId === null || ownedPostId !== selectedPostId) return;
+
+    const postId = selectedPostId;
+
+    await deleteSinglePost(postId);
+
+    setPosts((prevPosts) =>
+      prevPosts.filter((post) => String(post.postId) !== postId)
+    );
+
+    setOwnedPostId((currentId) => (currentId === postId ? null : currentId));
+    setSelectedPost((currentPost: any) =>
+      currentPost && String(currentPost.postId) === postId
+        ? null
+        : currentPost
+    );
   }
 
   // 게시글 작성 logic
@@ -313,6 +364,8 @@ function CommunityPage() {
             onClose={() => setSelectedPost(null)}
             onSubmitComment={handleWriteComment}
             onSubmitReply={handleWriteChildComment}
+            canDeletePost={selectedPostId !== null && ownedPostId === selectedPostId}
+            onDeletePost={handleDeleteSelectedPost}
           />
         ) : (
           <section className="community-board" aria-label="게시글 목록">

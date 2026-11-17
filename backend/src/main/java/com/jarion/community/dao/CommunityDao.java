@@ -43,4 +43,12 @@ public class CommunityDao {
     public void insertChildComment(CommunityCommentVO comment) {
         sqlSession.insert("insertChildComment", comment);
     }
+
+    public int findOwnPost(CommunityPostVO post) {
+        return sqlSession.selectOne("findOwnPost", post);
+    }
+
+    public void deleteSinglePost(String postId) {
+        sqlSession.update("deleteSinglePost", postId);
+    }
 }

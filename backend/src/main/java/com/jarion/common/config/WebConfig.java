@@ -28,7 +28,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/community/post/all",
                         "/api/community/category/all",
                         "/api/community/post/comment",
-                        "/api/community/post/viewcount"
+                        "/api/community/post/viewcount",
+                        "/api/community/post/ownPost"
                 );
     }
 }

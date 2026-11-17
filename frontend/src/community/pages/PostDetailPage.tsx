@@ -7,8 +7,25 @@ import { SessionExpiredError } from '../../common/api/apiFetch';
 var maxDepth = 10;
 
 type PostDetailProps = {
-    post: any;
-    comments: any[];
+    post: {
+        category: string;
+        categoryName: string;
+        title: string;
+        content: string;
+        userName: string;
+        userRole: string;
+        createDt?: string | null;
+        viewCount: number;
+    };
+    comments: {
+        commentId: string | number;
+        parentId?: string | number | null;
+        depth?: string | number | null;
+        userName: string;
+        userRole: string;
+        createDt?: string | null;
+        content: string;
+    }[];
     getRoleName: (role: string) => string;
     onClose: () => void;
     onSubmitComment: (content: string) => Promise<void>;
@@ -16,6 +33,8 @@ type PostDetailProps = {
         content: string,
         parentId: string
     ) => Promise<void>;
+    canDeletePost: boolean;
+    onDeletePost: () => Promise<void>;
 };
 
 function PostDetail({
@@ -24,7 +43,9 @@ function PostDetail({
     getRoleName,
     onClose,
     onSubmitComment,
-    onSubmitReply
+    onSubmitReply,
+    canDeletePost,
+    onDeletePost
 }: PostDetailProps) {
     const [commentContent, setCommentContent] = useState('');
     const [commentError, setCommentError] = useState('');
@@ -36,6 +57,10 @@ function PostDetail({
     const [replyTargetId, setReplyTargetId] = useState<string | null>(null);
     const [replyContent, setReplyContent] = useState('');
     const [replyError, setReplyError] = useState('');
+
+    // 게시글 삭제 관련
+    const [deletingPost, setDeletingPost] = useState(false);
+    const [deletePostError, setDeletePostError] = useState('');
 
     // 부모 댓글 바로 아래에 대댓글들 배치; 들여쓰기
     // 들여쓰기 깊이는 depth로 따짐
@@ -102,7 +127,7 @@ function PostDetail({
     }, [comments]);
 
     async function handleSubmitComment() {
-        if (submitting) return;
+        if (submitting || deletingPost) return;
 
         const content = commentContent.trim();
 
@@ -132,7 +157,7 @@ function PostDetail({
     }
 
     function handleToggleReply(commentId: string) {
-        if (submitting) return;
+        if (submitting || deletingPost) return;
 
         setReplyTargetId((prev) =>
             prev === commentId ? null : commentId
@@ -143,15 +168,37 @@ function PostDetail({
     }
 
     function handleCloseReply() {
-        if (submitting) return;
+        if (submitting || deletingPost) return;
 
         setReplyTargetId(null);
         setReplyContent('');
         setReplyError('');
     }
 
+    async function handleDeletePost() {
+        if (!canDeletePost || submitting || deletingPost) return;
+        if (!window.confirm('이 게시글을 삭제할까요?')) return;
+
+        setDeletingPost(true);
+        setDeletePostError('');
+
+        try {
+            await onDeletePost();
+        } catch (error) {
+            if (error instanceof SessionExpiredError) return;
+
+            setDeletePostError(
+                error instanceof Error
+                    ? error.message
+                    : '게시글 삭제에 실패했습니다.'
+            );
+        } finally {
+            setDeletingPost(false);
+        }
+    }
+
     async function handleSubmitReply() {
-        if (submitting) return;
+        if (submitting || deletingPost) return;
 
         const content = replyContent.trim();
 
@@ -200,13 +247,30 @@ function PostDetail({
                     </span>
 
                     <h2>{post.title}</h2>
+                    <div className="community-post-meta-row">
+                        <div className="community-meta">
+                            <strong>{post.userName}</strong>
+                            <span>{getRoleName(post.userRole)}</span>
+                            <span>{post.createDt?.replace('T', ' ')}</span>
+                            <span>조회 {post.viewCount}</span>
+                        </div>
 
-                    <div className="community-meta">
-                        <strong>{post.userName}</strong>
-                        <span>{getRoleName(post.userRole)}</span>
-                        <span>{post.createDt?.replace('T', ' ')}</span>
-                        <span>조회 {post.viewCount}</span>
+                        {canDeletePost && (
+                            <button
+                                type="button"
+                                className="community-post-delete"
+                                onClick={() => void handleDeletePost()}
+                                disabled={submitting || deletingPost}
+                            >
+                                {deletingPost ? '삭제 중...' : '삭제'}
+                            </button>
+                        )}
                     </div>
+                    {deletePostError && (
+                        <p className="community-comment-error" role="alert">
+                            {deletePostError}
+                        </p>
+                    )}
                 </header>
 
                 <div className="community-content">
@@ -239,7 +303,7 @@ function PostDetail({
                         }}
                         placeholder="댓글을 입력해주세요."
                         rows={4}
-                        disabled={submitting}
+                        disabled={submitting || deletingPost}
                     />
 
                     {commentError && (
@@ -256,7 +320,7 @@ function PostDetail({
                             type="submit"
                             className="community-comment-submit"
                             disabled={
-                                submitting || !commentContent.trim()
+                                submitting || deletingPost || !commentContent.trim()
                             }
                         >
                             {submitting ? '등록 중...' : '댓글 등록'}
@@ -308,7 +372,7 @@ function PostDetail({
                                             ? `reply-form-${comment.commentId}`
                                             : undefined
                                     }
-                                    disabled={submitting}
+                                    disabled={submitting || deletingPost}
                                 >
                                     <span className="community-meta">
                                         <strong>
@@ -371,7 +435,7 @@ function PostDetail({
                                             }}
                                             placeholder="답글을 입력해주세요."
                                             rows={3}
-                                            disabled={submitting}
+                                            disabled={submitting || deletingPost}
                                             autoFocus
                                         />
 
@@ -389,7 +453,7 @@ function PostDetail({
                                                 type="button"
                                                 className="community-reply-cancel"
                                                 onClick={handleCloseReply}
-                                                disabled={submitting}
+                                                disabled={submitting || deletingPost}
                                             >
                                                 취소
                                             </button>
@@ -399,6 +463,7 @@ function PostDetail({
                                                 className="community-reply-submit"
                                                 disabled={
                                                     submitting ||
+                                                    deletingPost ||
                                                     !replyContent.trim()
                                                 }
                                             >

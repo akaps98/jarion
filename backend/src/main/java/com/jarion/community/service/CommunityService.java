@@ -49,4 +49,15 @@ public class CommunityService {
     public void insertChildComment(CommunityCommentVO comment) {
         communityDao.insertChildComment(comment);
     }
+
+    // 로그인한 사용자의 게시글이 맞는지 체크
+    // 게시글 삭제 시 사용
+    public int findOwnPost(CommunityPostVO post) {
+        return communityDao.findOwnPost(post);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteSinglePost(String postId) {
+        communityDao.deleteSinglePost(postId);
+    }
 }
