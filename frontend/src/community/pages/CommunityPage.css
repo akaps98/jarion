@@ -334,3 +334,40 @@
   color: #4f46e5;
   font-weight: 700;
 }
+
+.community-toolbar {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.community-toolbar > p {
+  margin-right: auto;
+}
+
+.community-page-size {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.community-page-size select {
+  padding: 10px 12px;
+  border: 1px solid #dce0ea;
+  border-radius: 9px;
+  background-color: #fafbfe;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.community-page-size select:hover {
+  border-color: var(--primary);
+}
+
+.community-page-size select:focus-visible {
+  outline: 3px solid #a9b2ff;
+  outline-offset: 3px;
+}

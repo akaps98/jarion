@@ -11,8 +11,8 @@ import Button from "../../common/components/Button";
 import WritePostPage from "./WritePostPage";
 import { SessionExpiredError } from "../../common/api/apiFetch";
 
-// 한 페이지 당 게시글 갯수
-const PAGE_SIZE = 10;
+// 한 페이지 당 게시글 갯수 - 유저 선택 가능
+const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
 
 function CommunityPage() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -25,6 +25,7 @@ function CommunityPage() {
   const [keyword, setKeyword] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
   // 클릭한 게시글
   const [selectedPost, setSelectedPost] = useState<any | null>(null);
@@ -294,12 +295,13 @@ function CommunityPage() {
     )
   }
 
-  const pageCount = Math.ceil(filteredPosts.length / PAGE_SIZE);
+  const pageCount = Math.ceil(filteredPosts.length / pageSize);
+  const currentPage = Math.min(page, Math.max(1, pageCount));
 
   // 한 페이지당 보이는 게시글 수
   const visiblePosts = filteredPosts.slice(
-    (page - 1) * PAGE_SIZE,
-    page * PAGE_SIZE
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
   );
 
   // 카테고리 선택 시
@@ -373,6 +375,21 @@ function CommunityPage() {
               <p>
                 총 <strong>{filteredPosts.length}</strong>개의 이야기
               </p>
+
+              <label className="community-page-size">
+                페이지당 게시글 수{" "}
+                <select
+                  value={pageSize}
+                  onChange={(event) => {
+                    setPageSize(Number(event.target.value));
+                    setPage(1);
+                  }}
+                >
+                  {PAGE_SIZE_OPTIONS.map((size) => (
+                    <option key={size} value={size}>{size}개</option>
+                  ))}
+                </select>
+              </label>
 
               <input
                 className="community-search"
@@ -462,8 +479,8 @@ function CommunityPage() {
                     <button
                       key={number}
                       type="button"
-                      className={page === number ? "is-active" : ""}
-                      aria-current={page === number ? "page" : undefined}
+                      className={currentPage === number ? "is-active" : ""}
+                      aria-current={currentPage === number ? "page" : undefined}
                       aria-label={`${number}페이지`}
                       onClick={() => setPage(number)}
                     >
