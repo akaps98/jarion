@@ -132,8 +132,9 @@ public class CommunityController {
     }
 
     // 삭제 버튼 띄우기 위한 용도
+    // GET요청에 Body(@RequestBody) 사용불가!!!
     @GetMapping("/post/ownPost")
-    public ResponseEntity<?> findOwnPost(@RequestBody String postId, HttpSession session) {
+    public ResponseEntity<?> findOwnPost(@RequestParam String postId, HttpSession session) {
         log.debug("=====CommunityController::findOwnPost=====");
 
         UserVO loginUser = (UserVO) session.getAttribute("loginUser");
@@ -143,6 +144,10 @@ public class CommunityController {
 //        if(loginUser == null) {
 //            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 //        }
+
+        if(loginUser == null) {
+            return ResponseEntity.ok(0);
+        }
 
         CommunityPostVO postVO = new CommunityPostVO();
 
@@ -156,8 +161,10 @@ public class CommunityController {
         return ResponseEntity.ok(checkOwnPost);
     }
 
+    // 프론트에서 json으로 보내기때문에 String으로 받는게 아니라 VO 객체로 받아서 쓰면 됨;
+    // Jackson에 의하여 자동 바인딩!
     @PostMapping("/post/delete")
-    public ResponseEntity<?> deleteSinglePost(@RequestBody String postId, HttpSession session) {
+    public ResponseEntity<?> deleteSinglePost(@RequestBody CommunityPostVO postVO, HttpSession session) {
         log.debug("=====CommunityController::deleteSinglePost=====");
 
         UserVO loginUser = (UserVO) session.getAttribute("loginUser");
@@ -166,19 +173,17 @@ public class CommunityController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        CommunityPostVO postVO = new CommunityPostVO();
-
         postVO.setUserId(loginUser.getUserId());
-        postVO.setPostId(postId);
 
         // 현재 로그인한 사용자가 작성한 게시글의 작성자일 경우; 삭제 가능
         if (communityService.findOwnPost(postVO) > 0) {
-            communityService.deleteSinglePost(postId);
+            communityService.deleteSinglePost(postVO.getPostId());
 
             return ResponseEntity.ok().build();
         }
 
         // 현재 로그인한 사용자가 작성한 게시글의 작성자가 아닐 경우; 삭제 불가
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        // 401 -> 403으로 변경
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 }

@@ -203,7 +203,7 @@ function CommunityPage() {
       prevPosts.filter((post) => String(post.postId) !== postId)
     );
 
-    setOwnedPostId((currentId) => (currentId === postId ? null : currentId));
+    setOwnedPostId((currentId: any) => (currentId === postId ? null : currentId));
     setSelectedPost((currentPost: any) =>
       currentPost && String(currentPost.postId) === postId
         ? null

@@ -140,13 +140,7 @@ export const writeChildComment = async (
 export const findOwnPost = async (
     postId: string
 ) => {
-    const response = await apiFetch('/api/community/post/ownPost', {
-        method: "POST",
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            postId: postId
-        })
-    })
+    const response = await fetch(`/api/community/post/ownPost?postId=${encodeURIComponent(postId)}`)
 
     return response.json() as Promise<number>;
 }

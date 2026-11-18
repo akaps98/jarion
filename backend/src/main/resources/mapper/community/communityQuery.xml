@@ -135,11 +135,12 @@
     </insert>
 
     <select id="findOwnPost"
-            parameterType="com.jarion.community.vo.CommunityPostVO">
+            parameterType="com.jarion.community.vo.CommunityPostVO"
+            resultType="int">
         select count(cp.POST_ID)
-        from community_post cp
-        where cp.USER_ID = #{userId}
-        and cp.POST_ID = #{postId}
+          from community_post cp
+         where cp.USER_ID = #{userId}
+           and cp.POST_ID = #{postId}
     </select>
 
     <update id="deleteSinglePost"
