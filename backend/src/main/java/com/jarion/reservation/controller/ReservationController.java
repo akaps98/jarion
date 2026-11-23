@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+
+/*
+사진사 점유와 코스어 촬영 예약 관련
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/reservation")

@@ -1,8 +1,10 @@
 package com.jarion.reservation.vo;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -15,8 +17,8 @@ public class ReservationBoothVO {
     private String boothName;
 
     //선택 날짜의 사진사.
-    private Long userId;
+    private Long occupancyId;
     private String userName;
-    private boolean isUsing;
+    private boolean isUsable;
     private List<ReservationTimeTableVO> timeTable;
 }

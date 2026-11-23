@@ -12,6 +12,12 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.util.List;
 
+
+
+/*
+사진사 점유와 코스어 촬영 예약
+ */
+
 @Service
 public class ReservationService {
     private final ReservationDao reservationDao;
@@ -99,5 +105,13 @@ public class ReservationService {
         detail.setLocation(event.getLocation());
         detail.setDays(days);
         return detail;
+    }
+
+    public List<ReservationEventDayVO> getEventDays(Long eventId){
+        return reservationDao.selectEventDays(eventId);
+    }
+
+    public List<ReservationBoothVO> getEventBooths(Long eventId, LocalDate date){
+        return reservationDao.selectEventBoothsOfDays(eventId, date);
     }
 }

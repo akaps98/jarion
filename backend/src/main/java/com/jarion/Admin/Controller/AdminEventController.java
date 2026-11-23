@@ -16,6 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+
+/*
+관리자 행사 등록, 관리.
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/admin")

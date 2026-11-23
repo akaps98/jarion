@@ -5,6 +5,8 @@ import com.jarion.reservation.vo.*;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -55,6 +57,11 @@ public class ReservationDao {
 
     public List<ReservationEventDayVO> selectEventDays(Long eventId){
         return sqlSession.selectList("reservation.selectEventDays", eventId);
+    }
+
+    public List<ReservationBoothVO> selectEventBoothsOfDays(Long eventId, LocalDate date){
+        ReservationBoothSearchVO reservationBoothSearchVO = new ReservationBoothSearchVO(eventId, date);
+        return sqlSession.selectList("reservation.selectEventBoothsByDate", reservationBoothSearchVO);
     }
 
 }

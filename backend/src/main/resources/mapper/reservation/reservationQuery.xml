@@ -71,6 +71,28 @@
         AND EVENT_ID = #{eventId}
     </select>
 
+    <select id="selectEventBoothsByDate"
+            parameterType="com.jarion.reservation.vo.ReservationBoothSearchVO"
+            resultType="com.jarion.reservation.vo.ReservationBoothVO">
+        SELECT b.BOOTH_ID       AS boothId
+            ,  b.BOOTH_NAME     AS boothName
+            ,  b.POSITION_ROW   AS positionRow
+            ,  b.POSITION_COL   AS positionCol
+            ,  b.EVENT_ID       AS eventId
+            ,  o.OCCUPANCY_ID   AS occupancyId
+            ,  u.USER_NAME      AS userName
+        FROM reservation_booth b
+        LEFT JOIN reservation_booth_occupancy o
+            ON o.BOOTH_ID = b.BOOTH_ID
+            AND o.OCCUPANCY_DATE = #{date}
+            AND o.DELETE_YN = 'N'
+        LEFT JOIN users u
+            ON u.USER_ID = o.USER_ID
+        WHERE b.EVENT_ID = #{eventId}
+            AND b.DELETE_YN = 'N'
+        ORDER BY b.POSITION_ROW, b.POSITION_COL
+    </select>
+
     <select id="selectEventDays"
             parameterType="long"
             resultType="com.jarion.reservation.vo.ReservationEventDayVO">
