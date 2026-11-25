@@ -60,4 +60,9 @@ public class CommunityService {
     public void deleteSinglePost(String postId) {
         communityDao.deleteSinglePost(postId);
     }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteSingleComment(String commentId) {
+        communityDao.deleteSingleComment(commentId);
+    }
 }

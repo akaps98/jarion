@@ -176,11 +176,37 @@ public class CommunityController {
         postVO.setUserId(loginUser.getUserId());
 
         // 현재 로그인한 사용자가 작성한 게시글의 작성자일 경우; 삭제 가능
+        // 261125 jskang; 백단에서 확인 로직은 필요할거 같은데.. 프론트에서 안쓰게? 고민해볼것
         if (communityService.findOwnPost(postVO) > 0) {
             communityService.deleteSinglePost(postVO.getPostId());
 
             return ResponseEntity.ok().build();
         }
+
+        // 현재 로그인한 사용자가 작성한 게시글의 작성자가 아닐 경우; 삭제 불가
+        // 401 -> 403으로 변경
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    @PostMapping("/comment/delete")
+    public ResponseEntity<?> deleteSingleComment(@RequestBody CommunityCommentVO commentVO, HttpSession session) {
+        log.debug("=====CommunityController::deleteSingleComment=====");
+
+        UserVO loginUser = (UserVO) session.getAttribute("loginUser");
+
+        if(loginUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        commentVO.setUserId(loginUser.getUserId());
+
+        // 현재 로그인한 사용자가 작성한 게시글의 작성자일 경우; 삭제 가능
+        // 261125 jskang; 얘도 추후 확인
+//        if (communityService.findOwnPost(postVO) > 0) {
+//            communityService.deleteSinglePost(postVO.getPostId());
+//
+//            return ResponseEntity.ok().build();
+//        }
 
         // 현재 로그인한 사용자가 작성한 게시글의 작성자가 아닐 경우; 삭제 불가
         // 401 -> 403으로 변경

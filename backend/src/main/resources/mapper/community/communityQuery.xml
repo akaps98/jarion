@@ -149,4 +149,13 @@
            SET DELETE_YN = 'Y'
          WHERE POST_ID = #{postId}
     </update>
+
+    <update id="deleteSingleComment">
+        UPDATE community_comment
+        SET DELETE_YN = 'Y',
+        UPDATE_DT = CURRENT_TIMESTAMP
+        WHERE COMMENT_ID = #{commentId}
+        AND USER_ID = #{userId}
+        AND DELETE_YN = 'N'
+    </update>
 </mapper>

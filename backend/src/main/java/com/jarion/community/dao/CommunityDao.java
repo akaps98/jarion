@@ -51,4 +51,8 @@ public class CommunityDao {
     public void deleteSinglePost(String postId) {
         sqlSession.update("deleteSinglePost", postId);
     }
+
+    public void deleteSingleComment(String commentId) {
+        sqlSession.update("deleteSingleComment", commentId);
+    }
 }
