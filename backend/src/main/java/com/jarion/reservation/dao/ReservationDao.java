@@ -64,4 +64,8 @@ public class ReservationDao {
         return sqlSession.selectList("reservation.selectEventBoothsByDate", reservationBoothSearchVO);
     }
 
+    public List<ReservationReserveVO> selectReservationOfOccupancy(Long occupancyId){
+        return sqlSession.selectList("reservation.selectReservationOfOccupancy", occupancyId);
+    }
+
 }

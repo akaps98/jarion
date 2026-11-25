@@ -111,7 +111,33 @@ public class ReservationService {
         return reservationDao.selectEventDays(eventId);
     }
 
+    /*
+    (특정 행사, 특정 날짜)의 모든 부스 정보 조회.
+     */
     public List<ReservationBoothVO> getEventBooths(Long eventId, LocalDate date){
-        return reservationDao.selectEventBoothsOfDays(eventId, date);
+        List<ReservationBoothVO> eventBooths = reservationDao.selectEventBoothsOfDays(eventId, date);
+
+        for(ReservationBoothVO booth : eventBooths){
+            Long occupancyId = booth.getOccupancyId();
+
+            //1. Usable 체크 -> 지금 예약 가능한지. 아닌지.
+            //2. TimeTable 주입.
+
+            ReservationTimeTableVO timeTable = new ReservationTimeTableVO();
+            timeTable.setDate(date);
+
+            if(occupancyId == null){
+                timeTable.setReservations(List.of());
+            }
+            else{
+                booth.setUsable(true);
+                List<ReservationReserveVO> OccupancyReservations = reservationDao.selectReservationOfOccupancy(occupancyId);
+                timeTable.setReservations(OccupancyReservations);
+            }
+
+            booth.setTimeTable(List.of(timeTable));
+        }
+
+        return eventBooths;
     }
 }

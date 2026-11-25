@@ -1,80 +1,87 @@
-import { useState } from 'react';
-import { booths, hours, time, localDate } from '../demoData';
-import { useEffect } from 'react';
-import type { Booking, Status } from '../demoData';
+import { useEffect, useState } from 'react';
+import { apiFetch, SessionExpiredError } from '../../common/api/apiFetch';
 import './ReservationPage.css';
 
-const labels: Record<Status, string> = { PENDING: '승인 대기', ACCEPTED: '예약 확정', REJECTED: '거절됨' };
+type Event = { eventId: number; eventName: string; location: string };
+type Day = { eventDate: string; openTime: string; closeTime: string };
+type Detail = Event & { days: Day[] };
+type Range = { startTime: string; endTime: string };
+type Booth = { boothId: number; boothName: string; positionRow: number; positionCol: number; occupancyId: number | null; userName: string | null; timeTable: { date: string; reservations: Range[] }[] | null };
+async function getJson<T>(url: string, signal: AbortSignal): Promise<T> {
+  const response = await apiFetch(url, { signal });
+  if (!response.ok) throw new Error(`조회 실패 (${response.status})`);
+  return response.json();
+}
+function minutes(value: string) { const time = value.includes('T') ? value.split('T')[1] : value; const [hour, minute] = time.split(':').map(Number); return hour * 60 + minute; }
+function label(value: number) { return `${String(Math.floor(value / 60)).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`; }
 
-// 실제 API 연결 전 체험 화면. 변경 사항은 메모리에만 보관한다.
 export default function ReservationPage() {
-  const [today] = useState(() => localDate(new Date()));
+  const [events, setEvents] = useState<Event[]>([]);
+  const [eventId, setEventId] = useState('');
+  const [detail, setDetail] = useState<Detail | null>(null);
+  const [date, setDate] = useState('');
+  const [booths, setBooths] = useState<Booth[]>([]);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [duration, setDuration] = useState(30);
   const [now, setNow] = useState(() => Date.now());
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState('행사 목록을 불러오는 중입니다.');
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 30_000);
     return () => window.clearInterval(timer);
   }, []);
-  const [date, setDate] = useState(today);
-  const [mode, setMode] = useState<'USER' | 'PHOTO'>('USER');
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [hour, setHour] = useState<number | null>(null);
-  const [owned, setOwned] = useState<Record<string, number>>({});
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [message, setMessage] = useState('');
-  const selected = booths.find(b => b.id === selectedId);
-  const photographer = (id: number) => owned[date] === id ? '나의 데모 부스' : booths.find(b => b.id === id)?.photographer;
-  const active = bookings.filter(b => b.date === date && b.status !== 'REJECTED');
-  // 데모 신청자는 한 명이다. 다른 부스라도 같은 시간에는 신청할 수 없다.
-  const blocked = (h: number) => new Date(`${date}T${time(h)}:00`).getTime() <= now || active.some(b => b.hour === h);
-  const canSubmit = !!selected && (mode === 'PHOTO'
-    ? !photographer(selected.id) && !owned[date]
-    : !!photographer(selected.id) && hour !== null && !blocked(hour));
-  const list = bookings.filter(b => b.date === date && (mode === 'USER' || b.booth === owned[date]));
-  function reset() { setSelectedId(null); setHour(null); setMessage(''); }
-  function submit() {
-    if (!canSubmit || !selected) return;
-    if (mode === 'PHOTO') {
-      setOwned(prev => ({ ...prev, [date]: selected.id }));
-      setMessage(`${selected.name} 부스를 데모로 점유했어요. 코스어 체험에서 신청 후 수락·거절을 체험할 수 있어요.`);
-    } else if (hour !== null) {
-      setBookings(prev => [...prev, { id: Date.now(), date, booth: selected.id, hour, status: 'PENDING' }]);
-      setHour(null);
-      setMessage('데모 신청을 추가했어요. 승인 대기 중에도 시간은 선점돼요.');
-    }
-  }
-  function review(id: number, status: Status) {
-    setBookings(prev => prev.map(b => b.id === id && b.booth === owned[date] && b.status === 'PENDING' ? { ...b, status } : b));
-    setMessage(status === 'ACCEPTED' ? '데모 신청을 수락했어요.' : '데모 신청을 거절하고 시간을 반환했어요.');
-  }
-  return <div className="rv-page">
-    <div className="rv-notice"><strong>인터랙티브 데모</strong> 예시 부스와 사진사입니다. 실제 저장되지 않으며 새로고침하면 초기화됩니다.</div>
-    <header className="rv-heading"><div><p className="rv-eyebrow">FIND YOUR SPOT</p><h1>부스 예약</h1><p>날짜와 부스를 선택한 뒤 촬영 시간을 확인하세요.</p></div><span className="rv-brand">JARION RESERVATION</span></header>
-    <div className="rv-mode" aria-label="데모 역할 선택">{(['USER', 'PHOTO'] as const).map(role => <button key={role} aria-pressed={mode === role} onClick={() => { setMode(role); reset(); }}>{role === 'USER' ? '코스어 예약 체험' : '사진사 점유·관리 체험'}</button>)}</div>
-    <div className="rv-workspace">
-      <section className="rv-panel" aria-labelledby="rv-map-title">
-        <div className="rv-panel-top"><div><span className="rv-step">STEP 01</span><h2 id="rv-map-title">날짜와 부스 선택</h2></div><label className="rv-date">촬영 날짜<input type="date" min={today} value={date} onChange={e => { if (e.target.value && e.target.value >= today) { setDate(e.target.value); reset(); } }} /></label></div>
-        <p className="rv-help">{mode === 'PHOTO' ? '하루에 한 개의 빈 부스를 점유할 수 있어요.' : '사진사가 있는 부스를 선택해 촬영 시간을 확인하세요.'}</p>
-        <div className="rv-entrance">ENTRANCE · 입구</div>
-        <div className="rv-grid" aria-label="4행 4열 예시 부스 배치">{booths.map(b => {
-          const owner = photographer(b.id);
-          const disabled = mode === 'USER' ? !owner : !!owner || !!owned[date];
-          return <button key={b.id} disabled={disabled} aria-pressed={selectedId === b.id} aria-label={`${b.name}, ${owner || '미점유'}, ${disabled ? '선택 불가' : '선택 가능'}`} className={`rv-booth ${owner ? 'occupied' : 'empty'} ${selectedId === b.id ? 'selected' : ''} ${owned[date] === b.id ? 'mine' : ''}`} onClick={() => { setSelectedId(b.id); setHour(null); setMessage(''); }}><span aria-hidden="true">▣</span><strong>{b.name}</strong><small>{owned[date] === b.id ? '내 부스' : owner ? `${owner} 작가` : '미점유'}</small></button>;
-        })}</div>
-        <div className="rv-legend"><span><i className="occupied" />사진사 있음</span><span><i className="empty" />미점유</span><span><i className="selected" />선택한 부스</span></div><p className="rv-caption">4 × 4 예시 배치 · 실제 행사장 배치와는 다를 수 있어요.</p>
-      </section>
-      <aside className="rv-panel rv-summary" aria-labelledby="rv-summary-title"><span className="rv-step">STEP 02</span><h2 id="rv-summary-title">{mode === 'PHOTO' ? '하루 점유 확인' : '촬영 시간 선택'}</h2>
-        {!selected ? <div className="rv-placeholder"><span aria-hidden="true">▦</span><h3>부스를 선택해주세요</h3><p>{mode === 'PHOTO' ? '배치도에서 빈 부스를 선택해주세요.' : '사진사가 있는 부스를 선택해주세요.'}</p></div> : <>
-          <div className="rv-info"><span>{selected.name}</span><div><strong>{mode === 'PHOTO' ? '하루 동안 나의 촬영 공간' : `${photographer(selected.id)} 작가`}</strong><p>{selected.concept}</p></div></div>
-          <dl className="rv-details"><div><dt>촬영 날짜</dt><dd>{date}</dd></div><div><dt>이용 단위</dt><dd>{mode === 'PHOTO' ? '하루' : '1시간'}</dd></div></dl>
-          {mode === 'USER' && <><h3 className="rv-slot-title">촬영 시작 시간</h3><div className="rv-times">{hours.map(h => <button key={h} disabled={blocked(h)} aria-pressed={hour === h} onClick={() => setHour(h)}>{time(h)}<small>{blocked(h) ? '선택 불가' : '예약 가능'}</small></button>)}</div><p className="rv-fine">신청 즉시 시간이 선점되고, 사진사 수락 후 예약이 확정돼요.</p></>}
-          <div className="rv-choice"><span>{mode === 'PHOTO' ? '선택한 부스' : '선택한 시간'}</span><strong>{mode === 'PHOTO' ? selected.name : hour !== null ? `${time(hour)} – ${time(hour + 1)}` : '시간을 선택해주세요'}</strong></div>
-        </>}
-        <button className="rv-submit" disabled={!canSubmit} onClick={submit}>{mode === 'PHOTO' ? '데모 부스 점유하기' : '데모 촬영 신청하기'}<span aria-hidden="true">↗</span></button><p className="rv-fine">이 체험은 실제 예약에 영향을 주지 않아요.</p>
-      </aside>
-    </div>
-    <p className="rv-feedback" role="status">{message}</p>
-    <section className="rv-panel" aria-labelledby="rv-bookings-title"><div className="rv-panel-top"><div><span className="rv-step">MY RESERVATIONS</span><h2 id="rv-bookings-title">{mode === 'PHOTO' ? '내 부스 신청 관리' : '나의 데모 신청'}</h2></div><span className="rv-help">{date}</span></div>
-      {list.length === 0 ? <p className="rv-empty-message">{mode === 'PHOTO' ? owned[date] ? '코스어 예약 체험으로 전환해 내 부스에 신청하면 여기서 수락·거절할 수 있어요.' : '먼저 빈 부스를 점유해주세요.' : '아직 신청이 없어요. 부스와 시간을 선택해보세요.'}</p> : <ul className="rv-bookings">{list.map(b => <li key={b.id}><div><strong>{booths.find(booth => booth.id === b.booth)?.name} 부스</strong><p>{time(b.hour)} – {time(b.hour + 1)} · 데모 코스어</p></div><span className={`rv-status ${b.status}`}>{labels[b.status]}</span>{mode === 'PHOTO' && b.status === 'PENDING' && <div className="rv-actions"><button onClick={() => review(b.id, 'REJECTED')}>거절</button><button onClick={() => review(b.id, 'ACCEPTED')}>수락</button></div>}</li>)}</ul>}
+  useEffect(() => {
+    const controller = new AbortController();
+    getJson<Event[]>('/api/events', controller.signal).then(data => { setEvents(data); setEventId(data.length ? String(data[0].eventId) : ''); setLoading(''); })
+      .catch(e => { if (!controller.signal.aborted && !(e instanceof SessionExpiredError)) { setError('행사 목록을 불러오지 못했습니다.'); setLoading(''); } });
+    return () => controller.abort();
+  }, []);
+  useEffect(() => {
+    if (!eventId) return;
+    const controller = new AbortController();
+    getJson<Detail>(`/api/events/${encodeURIComponent(eventId)}`, controller.signal).then(data => { setDetail(data); setDate(data.days[0]?.eventDate ?? ''); setLoading(''); })
+      .catch(e => { if (!controller.signal.aborted && !(e instanceof SessionExpiredError)) { setError('행사 정보를 불러오지 못했습니다.'); setLoading(''); } });
+    return () => controller.abort();
+  }, [eventId]);
+  useEffect(() => {
+    if (!eventId || !date) return;
+    const controller = new AbortController();
+    getJson<Booth[]>(`/api/events/${encodeURIComponent(eventId)}/booths?date=${encodeURIComponent(date)}`, controller.signal).then(data => { setBooths(data); setLoading(''); })
+      .catch(e => { if (!controller.signal.aborted && !(e instanceof SessionExpiredError)) { setError('부스 정보를 불러오지 못했습니다.'); setLoading(''); } });
+    return () => controller.abort();
+  }, [eventId, date]);
+  const day = detail?.days.find(item => item.eventDate === date);
+  const selected = booths.find(booth => booth.boothId === selectedId);
+  const reservations = selected?.timeTable?.find(item => item.date === date)?.reservations;
+  const opening = day ? minutes(day.openTime) : 0, closing = day ? minutes(day.closeTime) : 0;
+  const starts = day ? Array.from({ length: Math.max(0, Math.ceil((closing - Math.ceil(opening / 30) * 30) / 30)) }, (_, i) => Math.ceil(opening / 30) * 30 + i * 30).filter(start => start + duration <= closing) : [];
+  const columns = Math.max(1, ...booths.map(booth => booth.positionCol));
+  const rows = Math.max(1, ...booths.map(booth => booth.positionRow));
+  function changeEvent(value: string) { setEventId(value); setDetail(null); setDate(''); setBooths([]); setSelectedId(null); setError(''); setLoading(value ? '행사 정보를 불러오는 중입니다.' : ''); }
+  function changeDate(value: string) { setDate(value); setBooths([]); setSelectedId(null); setError(''); setLoading(value ? '부스를 불러오는 중입니다.' : ''); }
+  return <main className="rv-page">
+    <header className="rv-heading"><div><h1>부스 예약</h1><p>행사와 날짜를 선택한 후 부스별 촬영 시간을 확인하세요.</p></div></header>
+    <section className="rv-panel rv-filters" aria-label="행사 선택">
+      <label>행사 <select value={eventId} onChange={e => changeEvent(e.target.value)}>{events.length === 0 && <option value="">등록된 행사가 없습니다</option>}{events.map(event => <option key={event.eventId} value={event.eventId}>{event.eventName} · {event.location}</option>)}</select></label>
+      <label>날짜 <select value={date} onChange={e => changeDate(e.target.value)} disabled={!detail?.days.length}>{!detail?.days.length && <option value="">운영일 없음</option>}{detail?.days.map(item => <option key={item.eventDate} value={item.eventDate}>{item.eventDate}</option>)}</select></label>
     </section>
-  </div>;
+    {error && <p className="rv-error" role="alert">{error} <button type="button" onClick={() => window.location.reload()}>다시 시도</button></p>}
+    {loading && <p role="status" className="rv-help">{loading}</p>}
+    {!loading && !error && detail && !detail.days.length && <p className="rv-help">이 행사에는 등록된 운영일이 없습니다.</p>}
+    {!loading && !error && date && <div className="rv-workspace">
+      <section className="rv-panel" aria-labelledby="rv-map-title"><div className="rv-panel-top"><h2 id="rv-map-title">부스 선택</h2><span className="rv-help">{date} · {day?.openTime.slice(0, 5)}~{day?.closeTime.slice(0, 5)}</span></div><p className="rv-help">부스를 누르면 시간표가 펼쳐집니다.</p>
+        {booths.length === 0 ? <p className="rv-help">등록된 부스가 없습니다.</p> : <div className="rv-grid-scroll"><div className="rv-grid" style={{ gridTemplateColumns: `repeat(${columns}, minmax(80px, 1fr))`, gridTemplateRows: `repeat(${rows}, auto)` }} aria-label="부스 배치">{booths.map(booth => <button key={booth.boothId} type="button" style={{ gridRow: booth.positionRow, gridColumn: booth.positionCol }} className={`rv-booth ${booth.occupancyId != null ? 'occupied' : 'empty'} ${selectedId === booth.boothId ? 'selected' : ''}`} aria-pressed={selectedId === booth.boothId} onClick={() => setSelectedId(previous => previous === booth.boothId ? null : booth.boothId)}><strong>{booth.boothName}</strong><small>{booth.occupancyId != null ? `${booth.userName ?? '사진사'}${booth.userName ? ' 작가' : ''}` : '미점유'}</small></button>)}</div></div>}
+        <div className="rv-legend"><span><i className="occupied" />사진사 있음</span><span><i className="empty" />미점유</span><span><i className="selected" />선택</span></div>
+      </section>
+      <section className="rv-panel rv-summary" aria-labelledby="rv-summary-title"><h2 id="rv-summary-title">부스 시간표</h2>
+        {!selected ? <p className="rv-help">부스를 선택해주세요.</p> : <><div className="rv-info"><span>{selected.boothName}</span><div><strong>{selected.occupancyId == null ? '사진사 미점유' : `${selected.userName ?? '사진사'}${selected.userName ? ' 작가' : ''}`}</strong><p>{date}</p></div></div>
+          {selected.occupancyId == null ? <p className="rv-help">사진사가 아직 점유하지 않은 부스입니다.</p> : reservations == null ? <p className="rv-help">이 부스의 시간표 정보를 받지 못했습니다.</p> : <><div className="rv-duration" aria-label="촬영 길이"><span>촬영 길이</span>{[30, 60].map(value => <button type="button" key={value} aria-pressed={duration === value} onClick={() => setDuration(value)}>{value}분</button>)}</div><p className="rv-fine">이 부스의 예약만 확인한 결과입니다. 본인의 다른 예약과 승인 상태는 확인하지 않았습니다.</p><div className="rv-times">{starts.map(start => {
+            const occupied = reservations.some(r => minutes(r.startTime) < start + duration && minutes(r.endTime) > start);
+            const past = new Date(`${date}T${label(start)}:00`).getTime() <= now;
+            return <div key={start} className={`rv-time-item ${occupied || past ? 'unavailable' : ''}`}><strong>{label(start)}–{label(start + duration)}</strong><small>{past ? '지난 시간' : occupied ? '예약됨' : '빈 시간'}</small></div>;
+          })}</div>{starts.length === 0 && <p className="rv-help">운영 시간 안에 선택할 수 있는 촬영 시간이 없습니다.</p>}<p className="rv-fine">촬영 신청 기능은 준비 중이며, 예약 가능 여부는 신청 시 서버에서 다시 확인해야 합니다.</p></>}
+        </>}
+      </section>
+    </div>}
+  </main>;
 }
