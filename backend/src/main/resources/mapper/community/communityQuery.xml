@@ -24,8 +24,9 @@
         , CREATE_DT AS createDt
         , UPDATE_DT AS updateDt
         , ( SELECT COUNT(cc.COMMENT_ID)
-        FROM community_comment cc
-        WHERE cc.POST_ID = cp.POST_ID
+              FROM community_comment cc
+             WHERE cc.POST_ID = cp.POST_ID
+               AND cc.DELETE_YN = 'N'
         ) AS commentCnt
         , ( SELECT u.USER_ROLE
         FROM users u
@@ -73,14 +74,17 @@
         WHERE u.USER_ID = cc.USER_ID)
         AS userRole
         , cc.depth AS depth
-        , cc.CONTENT AS content
+        , CASE
+            WHEN cc.DELETE_YN = 'Y' THEN '삭제된 댓글입니다.'
+            ELSE cc.CONTENT
+          END AS content
         , cc.CREATE_DT AS createDt
         , cc.UPDATE_DT AS updateDt
+        , cc.DELETE_YN AS deleteYn
         FROM community_comment cc
         JOIN community_post cp
         ON cc.POST_ID = cp.POST_ID
         WHERE cc.POST_ID = #{postId}
-        AND cc.DELETE_YN = 'N'
         ORDER BY cc.CREATE_DT ASC
     </select>
 
@@ -137,10 +141,11 @@
     <select id="findOwnPost"
             parameterType="com.jarion.community.vo.CommunityPostVO"
             resultType="int">
-        select count(cp.POST_ID)
-          from community_post cp
-         where cp.USER_ID = #{userId}
-           and cp.POST_ID = #{postId}
+        SELECT count(cp.POST_ID)
+          FROM community_post cp
+         WHERE cp.USER_ID = #{userId}
+           AND cp.POST_ID = #{postId}
+           AND cp.DELETE_YN = 'N'
     </select>
 
     <update id="deleteSinglePost"
@@ -154,10 +159,11 @@
     <select id="findOwnComment"
             parameterType="com.jarion.community.vo.CommunityCommentVO"
             resultType="int">
-        select count(cc.COMMENT_ID)
-          from community_comment cc
-         where cc.USER_ID = #{userId}
-          and cc.COMMENT_ID = #{commentId}
+        SELECT count(cc.COMMENT_ID)
+          FROM community_comment cc
+         WHERE cc.USER_ID = #{userId}
+           AND cc.COMMENT_ID = #{commentId}
+           AND cc.DELETE_YN = 'N'
     </select>
 
     <update id="deleteSingleComment">

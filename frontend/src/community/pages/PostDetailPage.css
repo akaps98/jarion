@@ -416,11 +416,19 @@
     flex-shrink: 0;
 }
 
-/* 댓글 삭제 버튼 영역 */
+/* 댓글 영역을 삭제 버튼의 위치 기준으로 설정 */
+.community-comment {
+    position: relative;
+}
+
+/* 댓글 삭제 버튼 위치 */
 .community-comment-delete-actions {
+    position: absolute;
+    top: 30px;
+    right: 12px;
+    margin: 0;
     display: flex;
     justify-content: flex-end;
-    margin-top: 6px;
 }
 
 /* 댓글 삭제 버튼 */
@@ -441,4 +449,8 @@
 .community-comment-delete:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.community-comment-trigger {
+    padding-right: 65px;
 }

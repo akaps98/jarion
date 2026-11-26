@@ -21,7 +21,8 @@ type PostDetailProps = {
     };
     comments: {
         commentId: string | number;
-        userId: string | number;
+        deleteYn: 'Y' | 'N';
+        userId: string | number | null;
         parentId?: string | number | null;
         depth?: string | number | null;
         userName: string;
@@ -261,6 +262,7 @@ function PostDetail({
         if (
             loginUser?.userId == null ||
             comment?.userId == null ||
+            comment.deleteYn === 'Y' ||
             String(loginUser.userId) !== String(comment.userId)
         ) return;
 
@@ -292,6 +294,10 @@ function PostDetail({
 
     async function handleSubmitReply() {
         if (busy) return;
+
+        if (comments.some((comment) =>
+            String(comment.commentId) === replyTargetId && comment.deleteYn === 'Y'
+        )) return;
 
         const content = replyContent.trim();
 
@@ -373,7 +379,7 @@ function PostDetail({
 
             <section className="community-comments" aria-label="댓글">
                 <h3>
-                    댓글 <span>{comments.length}</span>
+                    댓글 <span>{comments.filter((comment) => comment.deleteYn !== 'Y').length}</span>
                 </h3>
 
                 <form
@@ -433,8 +439,9 @@ function PostDetail({
                     </p>
                 ) : (
                     displayComments.map((comment) => {
+                        const isDeleted = comment.deleteYn === 'Y';
                         const isReplyOpen =
-                            replyTargetId === comment.commentId;
+                            !isDeleted && replyTargetId === comment.commentId;
 
                         const visibleDepth = Math.min(
                             comment.depth,
@@ -443,6 +450,7 @@ function PostDetail({
 
                         // 본인이 작성한 댓글에만 삭제 버튼 표시
                         const canDeleteComment =
+                            !isDeleted &&
                             loginUser?.userId != null &&
                             comment.userId != null &&
                             String(loginUser.userId) === String(comment.userId);
@@ -463,51 +471,57 @@ function PostDetail({
                                     marginLeft: `calc(${visibleDepth} * var(--comment-indent))`
                                 }}
                             >
-                                <button
-                                    type="button"
-                                    className="community-comment-trigger"
-                                    onClick={() =>
-                                        handleToggleReply(
-                                            comment.commentId
-                                        )
-                                    }
-                                    aria-expanded={isReplyOpen}
-                                    aria-controls={
-                                        isReplyOpen
-                                            ? `reply-form-${comment.commentId}`
-                                            : undefined
-                                    }
-                                    disabled={busy}
-                                >
-                                    <span className="community-meta">
-                                        <strong>
-                                            {comment.userName}
-                                        </strong>
-
-                                        <span>
-                                            {getRoleName(
-                                                comment.userRole
-                                            )}
+                                {isDeleted ? (
+                                    <p className="community-comment-deleted">
+                                        삭제된 댓글입니다.
+                                    </p>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        className="community-comment-trigger"
+                                        onClick={() =>
+                                            handleToggleReply(
+                                                comment.commentId
+                                            )
+                                        }
+                                        aria-expanded={isReplyOpen}
+                                        aria-controls={
+                                            isReplyOpen
+                                                ? `reply-form-${comment.commentId}`
+                                                : undefined
+                                        }
+                                        disabled={busy}
+                                    >
+                                        <span className="community-meta">
+                                            <strong>
+                                                {comment.userName}
+                                            </strong>
+    
+                                            <span>
+                                                {getRoleName(
+                                                    comment.userRole
+                                                )}
+                                            </span>
+    
+                                            <span>
+                                                {comment.createDt?.replace(
+                                                    'T',
+                                                    ' '
+                                                )}
+                                            </span>
                                         </span>
-
-                                        <span>
-                                            {comment.createDt?.replace(
-                                                'T',
-                                                ' '
-                                            )}
+    
+                                        <span className="community-comment-text">
+                                            {comment.content}
                                         </span>
-                                    </span>
-
-                                    <span className="community-comment-text">
-                                        {comment.content}
-                                    </span>
-
-                                    <span className="community-reply-toggle">
-                                        {isReplyOpen
-                                            ? '답글 닫기'
-                                            : '답글 쓰기'}
-                                    </span>
-                                </button>
+    
+                                        <span className="community-reply-toggle">
+                                            {isReplyOpen
+                                                ? '답글 닫기'
+                                                : '답글 쓰기'}
+                                        </span>
+                                    </button>
+                                )}
 
                                 {canDeleteComment && (
                                     <div className="community-comment-delete-actions">

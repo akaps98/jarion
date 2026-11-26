@@ -230,7 +230,7 @@ function CommunityPage() {
     // return 필수; 현재 게시글로
     setSelectedPost((prevPost: any) => {
       return prevPost?.postId === postId
-      ? {...prevPost, commentCnt: commentsList.length}
+      ? {...prevPost, commentCnt: commentsList.filter((comment: { deleteYn?: string }) => comment.deleteYn !== 'Y').length}
       : prevPost
     })
 
@@ -238,7 +238,7 @@ function CommunityPage() {
     setPosts((prevPost) => 
       prevPost.map((item) =>
         item.postId === postId
-        ? {...item, commentCnt: commentsList.length}
+        ? {...item, commentCnt: commentsList.filter((comment: { deleteYn?: string }) => comment.deleteYn !== 'Y').length}
         : item
       )
     )
@@ -256,14 +256,14 @@ function CommunityPage() {
 
     setSelectedPost((prevPost: any) => {
       return prevPost?.postId === postId
-      ? {...prevPost, commentCnt: commentsList.length}
+      ? {...prevPost, commentCnt: commentsList.filter((comment: { deleteYn?: string }) => comment.deleteYn !== 'Y').length}
       : prevPost
     })
 
     setPosts((prevPost) => 
       prevPost.map((item) => 
         item.postId === postId
-        ? {...item, commentCnt: commentsList.length}
+        ? {...item, commentCnt: commentsList.filter((comment: { deleteYn?: string }) => comment.deleteYn !== 'Y').length}
         : item
       )
     )
@@ -285,7 +285,7 @@ function CommunityPage() {
     // 현재 게시글의 댓글 수 갱신
     setSelectedPost((prevPost: any) =>
       prevPost?.postId === postId
-        ? {...prevPost, commentCnt: commentsList.length}
+        ? {...prevPost, commentCnt: commentsList.filter((comment: { deleteYn?: string }) => comment.deleteYn !== 'Y').length}
         : prevPost
     );
 
@@ -293,7 +293,7 @@ function CommunityPage() {
     setPosts((prevPosts) =>
       prevPosts.map((item) =>
         item.postId === postId
-          ? {...item, commentCnt: commentsList.length}
+          ? {...item, commentCnt: commentsList.filter((comment: { deleteYn?: string }) => comment.deleteYn !== 'Y').length}
           : item
       )
     );
