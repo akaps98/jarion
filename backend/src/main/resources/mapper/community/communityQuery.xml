@@ -146,16 +146,25 @@
     <update id="deleteSinglePost"
             parameterType="string">
         UPDATE community_post
-           SET DELETE_YN = 'Y'
+           SET DELETE_YN = 'Y',
+               DELETE_DT = NOW()
          WHERE POST_ID = #{postId}
     </update>
 
+    <select id="findOwnComment"
+            parameterType="com.jarion.community.vo.CommunityCommentVO"
+            resultType="int">
+        select count(cc.COMMENT_ID)
+          from community_comment cc
+         where cc.USER_ID = #{userId}
+          and cc.COMMENT_ID = #{commentId}
+    </select>
+
     <update id="deleteSingleComment">
         UPDATE community_comment
-        SET DELETE_YN = 'Y',
-        UPDATE_DT = CURRENT_TIMESTAMP
-        WHERE COMMENT_ID = #{commentId}
-        AND USER_ID = #{userId}
-        AND DELETE_YN = 'N'
+           SET DELETE_YN = 'Y',
+               DELETE_DT = NOW()
+         WHERE COMMENT_ID = #{commentId}
+           AND DELETE_YN = 'N'
     </update>
 </mapper>

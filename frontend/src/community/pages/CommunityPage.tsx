@@ -5,11 +5,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CommunityPage.css";
-import { allPosts, allCategories, updatePostViewCount, commentsForPost, writeComment, writeChildComment, findOwnPost, deleteSinglePost } from "../api/communityApi";
+import { allPosts, allCategories, updatePostViewCount, commentsForPost, writeComment, writeChildComment, deleteSinglePost, deleteSingleComment } from "../api/communityApi";
 import PostDetail from "./PostDetailPage";
 import Button from "../../common/components/Button";
 import WritePostPage from "./WritePostPage";
 import { SessionExpiredError } from "../../common/api/apiFetch";
+import { checkSession } from "../../common/api/commonApi";
 
 // 한 페이지 당 게시글 갯수 - 유저 선택 가능
 const PAGE_SIZE_OPTIONS = [5, 10, 25, 50];
@@ -29,42 +30,12 @@ function CommunityPage() {
   const [page, setPage] = useState(1);
   // 클릭한 게시글
   const [selectedPost, setSelectedPost] = useState<any | null>(null);
-  // 본인의 게시글인가?
-  const [ownedPostId, setOwnedPostId] = useState<any | null>(null);
   // 글쓰기 페이지
   const [goWritePost, setGoWritePost] = useState(false);
 
   const navigate = useNavigate();
 
   const selectedPostId = selectedPost?.postId == null ? null : String(selectedPost.postId);
-
-  useEffect(() => {
-    if (selectedPostId === null) return;
-
-    const postId = selectedPostId;
-    let active = true;
-
-    async function checkOwnership() {
-      try {
-        const sessionResponse = await fetch("/api/auth/session");
-        if (!active || !sessionResponse.ok) return;
-
-        const isOwnPost = await findOwnPost(postId);
-
-        if (active) {
-          setOwnedPostId(isOwnPost === 1 ? postId : null);
-        }
-      } catch {
-        // 작성자 확인에 실패하면 삭제 버튼을 숨긴 상태로 유지
-      }
-    }
-
-    void checkOwnership();
-
-    return () => {
-      active = false;
-    };
-  }, [selectedPostId]);
 
   useEffect(() => {
     const loadData = async() => {
@@ -97,13 +68,17 @@ function CommunityPage() {
 
   async function handleOpenWritePost() {
       try {
-          const response = await fetch('/api/auth/session');
+          const response = await checkSession();
 
           // 로그인 하지않고 글쓰기 버튼 클릭 시 로그인 화면으로
           if (response.status === 401) {
               alert('로그인이 필요합니다.');
               navigate('/login');
               return;
+          }
+
+          if (!response.ok) {
+              throw new Error('세션 확인에 실패했습니다.');
           }
 
           setGoWritePost(true);
@@ -194,7 +169,7 @@ function CommunityPage() {
   }
 
   async function handleDeleteSelectedPost() {
-    if (selectedPostId === null || ownedPostId !== selectedPostId) return;
+    if (selectedPostId === null) return;
 
     const postId = selectedPostId;
 
@@ -204,7 +179,6 @@ function CommunityPage() {
       prevPosts.filter((post) => String(post.postId) !== postId)
     );
 
-    setOwnedPostId((currentId: any) => (currentId === postId ? null : currentId));
     setSelectedPost((currentPost: any) =>
       currentPost && String(currentPost.postId) === postId
         ? null
@@ -255,7 +229,7 @@ function CommunityPage() {
     // 댓글 작성 후 현재 게시글의 댓글 수 갱신
     // return 필수; 현재 게시글로
     setSelectedPost((prevPost: any) => {
-      return prevPost.postId === postId
+      return prevPost?.postId === postId
       ? {...prevPost, commentCnt: commentsList.length}
       : prevPost
     })
@@ -281,7 +255,7 @@ function CommunityPage() {
     setComments(commentsList);
 
     setSelectedPost((prevPost: any) => {
-      return prevPost.postId === postId
+      return prevPost?.postId === postId
       ? {...prevPost, commentCnt: commentsList.length}
       : prevPost
     })
@@ -293,6 +267,36 @@ function CommunityPage() {
         : item
       )
     )
+  }
+
+  // 댓글 삭제 logic
+  async function handleDeleteSelectedComment(commentId: string) {
+    const postId = selectedPost?.postId;
+    if (postId == null) {
+      throw new Error("선택된 게시글이 없습니다.");
+    }
+
+    await deleteSingleComment(commentId);
+
+    // 삭제 후 댓글 목록 재조회
+    const commentsList = await commentsForPost(postId);
+    setComments(commentsList);
+
+    // 현재 게시글의 댓글 수 갱신
+    setSelectedPost((prevPost: any) =>
+      prevPost?.postId === postId
+        ? {...prevPost, commentCnt: commentsList.length}
+        : prevPost
+    );
+
+    // 게시글 목록의 댓글 수 갱신
+    setPosts((prevPosts) =>
+      prevPosts.map((item) =>
+        item.postId === postId
+          ? {...item, commentCnt: commentsList.length}
+          : item
+      )
+    );
   }
 
   const pageCount = Math.ceil(filteredPosts.length / pageSize);
@@ -366,8 +370,8 @@ function CommunityPage() {
             onClose={() => setSelectedPost(null)}
             onSubmitComment={handleWriteComment}
             onSubmitReply={handleWriteChildComment}
-            canDeletePost={selectedPostId !== null && ownedPostId === selectedPostId}
             onDeletePost={handleDeleteSelectedPost}
+            onDeleteComment={handleDeleteSelectedComment}
           />
         ) : (
           <section className="community-board" aria-label="게시글 목록">

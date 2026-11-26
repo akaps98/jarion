@@ -131,36 +131,6 @@ public class CommunityController {
         return ResponseEntity.ok().build();
     }
 
-    // 삭제 버튼 띄우기 위한 용도
-    // GET요청에 Body(@RequestBody) 사용불가!!!
-    @GetMapping("/post/ownPost")
-    public ResponseEntity<?> findOwnPost(@RequestParam String postId, HttpSession session) {
-        log.debug("=====CommunityController::findOwnPost=====");
-
-        UserVO loginUser = (UserVO) session.getAttribute("loginUser");
-
-        // 로그인 하지 않은 유저도 게시글 조회 가능
-        // 해당 단계에서 UNAUTHORIZED 띄울 시 로직에 맞지 않음
-//        if(loginUser == null) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-//        }
-
-        if(loginUser == null) {
-            return ResponseEntity.ok(0);
-        }
-
-        CommunityPostVO postVO = new CommunityPostVO();
-
-        postVO.setUserId(loginUser.getUserId());
-        postVO.setPostId(postId);
-
-        // 0: 본인의 게시글 아님
-        // 1: 본인의 게시글임
-        int checkOwnPost = communityService.findOwnPost(postVO);
-
-        return ResponseEntity.ok(checkOwnPost);
-    }
-
     // 프론트에서 json으로 보내기때문에 String으로 받는게 아니라 VO 객체로 받아서 쓰면 됨;
     // Jackson에 의하여 자동 바인딩!
     @PostMapping("/post/delete")
@@ -177,6 +147,7 @@ public class CommunityController {
 
         // 현재 로그인한 사용자가 작성한 게시글의 작성자일 경우; 삭제 가능
         // 261125 jskang; 백단에서 확인 로직은 필요할거 같은데.. 프론트에서 안쓰게? 고민해볼것
+        // 261126 jskang; 백단에서만 쓰는걸로. 프론트에서 쓰는건 지움
         if (communityService.findOwnPost(postVO) > 0) {
             communityService.deleteSinglePost(postVO.getPostId());
 
@@ -194,22 +165,20 @@ public class CommunityController {
 
         UserVO loginUser = (UserVO) session.getAttribute("loginUser");
 
-        if(loginUser == null) {
+        if (loginUser == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         commentVO.setUserId(loginUser.getUserId());
 
-        // 현재 로그인한 사용자가 작성한 게시글의 작성자일 경우; 삭제 가능
-        // 261125 jskang; 얘도 추후 확인
-//        if (communityService.findOwnPost(postVO) > 0) {
-//            communityService.deleteSinglePost(postVO.getPostId());
-//
-//            return ResponseEntity.ok().build();
-//        }
+        // 현재 로그인한 사용자가 작성한 댓글일 경우; 삭제 가능
+        if (communityService.findOwnComment(commentVO) > 0) {
+            communityService.deleteSingleComment(commentVO.getCommentId());
 
-        // 현재 로그인한 사용자가 작성한 게시글의 작성자가 아닐 경우; 삭제 불가
-        // 401 -> 403으로 변경
+            return ResponseEntity.ok().build();
+        }
+
+        // 현재 로그인한 사용자가 작성한 댓글이 아닐 경우; 삭제 불가
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 }

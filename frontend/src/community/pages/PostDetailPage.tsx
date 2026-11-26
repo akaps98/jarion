@@ -1,13 +1,15 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Button from '../../common/components/Button';
 import './PostDetailPage.css';
 import { SessionExpiredError } from '../../common/api/apiFetch';
+import { checkSession } from '../../common/api/commonApi';
 
 // depth 10까지
 var maxDepth = 10;
 
 type PostDetailProps = {
     post: {
+        userId: string | number;
         category: string;
         categoryName: string;
         title: string;
@@ -19,6 +21,7 @@ type PostDetailProps = {
     };
     comments: {
         commentId: string | number;
+        userId: string | number;
         parentId?: string | number | null;
         depth?: string | number | null;
         userName: string;
@@ -33,8 +36,8 @@ type PostDetailProps = {
         content: string,
         parentId: string
     ) => Promise<void>;
-    canDeletePost: boolean;
     onDeletePost: () => Promise<void>;
+    onDeleteComment: (commentId: string) => Promise<void>;
 };
 
 function PostDetail({
@@ -44,8 +47,8 @@ function PostDetail({
     onClose,
     onSubmitComment,
     onSubmitReply,
-    canDeletePost,
-    onDeletePost
+    onDeletePost,
+    onDeleteComment
 }: PostDetailProps) {
     const [commentContent, setCommentContent] = useState('');
     const [commentError, setCommentError] = useState('');
@@ -61,6 +64,56 @@ function PostDetail({
     // 게시글 삭제 관련
     const [deletingPost, setDeletingPost] = useState(false);
     const [deletePostError, setDeletePostError] = useState('');
+
+    // 댓글 삭제 관련
+    const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
+    const [deleteCommentError, setDeleteCommentError] = useState('');
+    const busy = submitting || deletingPost || deletingCommentId !== null;
+
+    // 로그인 사용자 정보
+    const [loginUser, setLoginUser] = useState<{
+        userId: string | number;
+    } | null>(null);
+
+    // 게시글 상세 화면 진입 시 세션 조회
+    useEffect(() => {
+        let active = true;
+
+        async function loadLoginUser() {
+            try {
+                const response = await checkSession();
+
+                if (!active) return;
+
+                if (!response.ok) {
+                    setLoginUser(null);
+                    return;
+                }
+
+                const user = await response.json();
+
+                if (active) {
+                    setLoginUser(user);
+                }
+            } catch {
+                if (active) {
+                    setLoginUser(null);
+                }
+            }
+        }
+
+        void loadLoginUser();
+
+        return () => {
+            active = false;
+        };
+    }, []);
+
+    // 게시글 작성자 여부 확인
+    const canDeletePost =
+        loginUser?.userId != null &&
+        post.userId != null &&
+        String(loginUser.userId) === String(post.userId);
 
     // 부모 댓글 바로 아래에 대댓글들 배치; 들여쓰기
     // 들여쓰기 깊이는 depth로 따짐
@@ -127,7 +180,7 @@ function PostDetail({
     }, [comments]);
 
     async function handleSubmitComment() {
-        if (submitting || deletingPost) return;
+        if (busy) return;
 
         const content = commentContent.trim();
 
@@ -157,7 +210,7 @@ function PostDetail({
     }
 
     function handleToggleReply(commentId: string) {
-        if (submitting || deletingPost) return;
+        if (busy) return;
 
         setReplyTargetId((prev) =>
             prev === commentId ? null : commentId
@@ -168,7 +221,7 @@ function PostDetail({
     }
 
     function handleCloseReply() {
-        if (submitting || deletingPost) return;
+        if (busy) return;
 
         setReplyTargetId(null);
         setReplyContent('');
@@ -176,7 +229,7 @@ function PostDetail({
     }
 
     async function handleDeletePost() {
-        if (!canDeletePost || submitting || deletingPost) return;
+        if (!canDeletePost || busy) return;
         if (!window.confirm('이 게시글을 삭제할까요?')) return;
 
         setDeletingPost(true);
@@ -197,8 +250,48 @@ function PostDetail({
         }
     }
 
+    // 댓글 삭제
+    async function handleDeleteComment(commentId: string) {
+        if (busy) return;
+
+        const comment = comments.find(
+            (item) => String(item.commentId) === commentId
+        );
+
+        if (
+            loginUser?.userId == null ||
+            comment?.userId == null ||
+            String(loginUser.userId) !== String(comment.userId)
+        ) return;
+
+        if (!window.confirm('이 댓글을 삭제할까요?')) return;
+
+        setDeletingCommentId(commentId);
+        setDeleteCommentError('');
+
+        try {
+            await onDeleteComment(commentId);
+
+            if (replyTargetId === commentId) {
+                setReplyTargetId(null);
+                setReplyContent('');
+                setReplyError('');
+            }
+        } catch (error) {
+            if (error instanceof SessionExpiredError) return;
+
+            setDeleteCommentError(
+                error instanceof Error
+                    ? error.message
+                    : '댓글 삭제에 실패했습니다.'
+            );
+        } finally {
+            setDeletingCommentId(null);
+        }
+    }
+
     async function handleSubmitReply() {
-        if (submitting || deletingPost) return;
+        if (busy) return;
 
         const content = replyContent.trim();
 
@@ -260,7 +353,7 @@ function PostDetail({
                                 type="button"
                                 className="community-post-delete"
                                 onClick={() => void handleDeletePost()}
-                                disabled={submitting || deletingPost}
+                                disabled={busy}
                             >
                                 {deletingPost ? '삭제 중...' : '삭제'}
                             </button>
@@ -303,7 +396,7 @@ function PostDetail({
                         }}
                         placeholder="댓글을 입력해주세요."
                         rows={4}
-                        disabled={submitting || deletingPost}
+                        disabled={busy}
                     />
 
                     {commentError && (
@@ -320,13 +413,19 @@ function PostDetail({
                             type="submit"
                             className="community-comment-submit"
                             disabled={
-                                submitting || deletingPost || !commentContent.trim()
+                                busy || !commentContent.trim()
                             }
                         >
                             {submitting ? '등록 중...' : '댓글 등록'}
                         </button>
                     </div>
                 </form>
+
+                {deleteCommentError && (
+                    <p className="community-comment-error" role="alert">
+                        {deleteCommentError}
+                    </p>
+                )}
 
                 {displayComments.length === 0 ? (
                     <p className="community-comment-empty">
@@ -341,6 +440,12 @@ function PostDetail({
                             comment.depth,
                             maxDepth
                         );
+
+                        // 본인이 작성한 댓글에만 삭제 버튼 표시
+                        const canDeleteComment =
+                            loginUser?.userId != null &&
+                            comment.userId != null &&
+                            String(loginUser.userId) === String(comment.userId);
 
                         return (
                             <article
@@ -372,7 +477,7 @@ function PostDetail({
                                             ? `reply-form-${comment.commentId}`
                                             : undefined
                                     }
-                                    disabled={submitting || deletingPost}
+                                    disabled={busy}
                                 >
                                     <span className="community-meta">
                                         <strong>
@@ -403,6 +508,21 @@ function PostDetail({
                                             : '답글 쓰기'}
                                     </span>
                                 </button>
+
+                                {canDeleteComment && (
+                                    <div className="community-comment-delete-actions">
+                                        <button
+                                            type="button"
+                                            className="community-comment-delete"
+                                            onClick={() => void handleDeleteComment(comment.commentId)}
+                                            disabled={busy}
+                                        >
+                                            {deletingCommentId === comment.commentId
+                                                ? '삭제 중...'
+                                                : '삭제'}
+                                        </button>
+                                    </div>
+                                )}
 
                                 {isReplyOpen && (
                                     <form
@@ -435,7 +555,7 @@ function PostDetail({
                                             }}
                                             placeholder="답글을 입력해주세요."
                                             rows={3}
-                                            disabled={submitting || deletingPost}
+                                            disabled={busy}
                                             autoFocus
                                         />
 
@@ -453,7 +573,7 @@ function PostDetail({
                                                 type="button"
                                                 className="community-reply-cancel"
                                                 onClick={handleCloseReply}
-                                                disabled={submitting || deletingPost}
+                                                disabled={busy}
                                             >
                                                 취소
                                             </button>
@@ -462,8 +582,7 @@ function PostDetail({
                                                 type="submit"
                                                 className="community-reply-submit"
                                                 disabled={
-                                                    submitting ||
-                                                    deletingPost ||
+                                                    busy ||
                                                     !replyContent.trim()
                                                 }
                                             >

@@ -55,4 +55,8 @@ public class CommunityDao {
     public void deleteSingleComment(String commentId) {
         sqlSession.update("deleteSingleComment", commentId);
     }
+
+    public int findOwnComment(CommunityCommentVO comment) {
+        return sqlSession.selectOne("findOwnComment", comment);
+    }
 }

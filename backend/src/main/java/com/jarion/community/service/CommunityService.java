@@ -51,7 +51,7 @@ public class CommunityService {
     }
 
     // 로그인한 사용자의 게시글이 맞는지 체크
-    // 게시글 삭제 시 사용
+    // 게시글 삭제 시 사용 - 백단에서만 사용
     public int findOwnPost(CommunityPostVO post) {
         return communityDao.findOwnPost(post);
     }
@@ -64,5 +64,11 @@ public class CommunityService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteSingleComment(String commentId) {
         communityDao.deleteSingleComment(commentId);
+    }
+
+    // 로그인한 사용자의 댓글이 맞는지 체크
+    // 댓글 삭제 시 사용 - 백단에서만 사용
+    public int findOwnComment(CommunityCommentVO comment) {
+        return communityDao.findOwnComment(comment);
     }
 }
